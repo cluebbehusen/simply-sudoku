@@ -42,30 +42,31 @@ function Board:init()
             gfx.drawLine(table.unpack(rightLine))
         end
 
-        local pad = 2
         if selected then
-            gfx.fillRect(x + pad, y + pad, width - pad * 2 - 1, height - pad * 2 - 1)
+            gfx.fillRect(x, y, width - 1, height - 1)
         end
 
         local value = cells[row][column]:getStringValue()
-        local valueImage = gfx.image.new(gfx.getTextSize(value))
-        gfx.pushContext(valueImage)
-            if selected then
-                gfx.setImageDrawMode(playdate.graphics.kDrawModeFillWhite)
-            end
-            gfx.drawText(value, 0, 0)
-        gfx.popContext()
+        if value then
+            local valueImage = gfx.image.new(gfx.getTextSize(value))
+            gfx.pushContext(valueImage)
+                if selected then
+                    gfx.setImageDrawMode(playdate.graphics.kDrawModeFillWhite)
+                end
+                gfx.drawText(value, 0, 0)
+            gfx.popContext()
 
-        local textScale = 2
+            local textScale = 2
 
-        imageX, imageY = valueImage:getSize()
-        scaledX = imageX * textScale
-        scaledY = imageY * textScale
+            imageX, imageY = valueImage:getSize()
+            scaledX = imageX * textScale
+            scaledY = imageY * textScale
 
-        offsetX = x + (width - scaledX) / 2
-        offsetY = y + (height - scaledY) / 2
+            offsetX = x + (width - scaledX) / 2
+            offsetY = y + (height - scaledY) / 2
 
-        valueImage:drawScaled(offsetX - 1, offsetY - 1, textScale)
+            valueImage:drawScaled(offsetX - 1, offsetY - 1, textScale)
+        end
     end
 
     self:setCenter(0, 0)
@@ -74,7 +75,16 @@ function Board:init()
 end
 
 function Board:update()
-    if pd.buttonJustPressed(pd.kButtonUp) then
+    local valueChanged = false
+    if pd.buttonJustPressed(pd.kButtonA) then
+        local _, row, column = self.gridview:getSelection()
+        self.cells[row][column]:incrementValue()
+        valueChanged = true
+    elseif pd.buttonJustPressed(pd.kButtonB) then
+        local _, row, column = self.gridview:getSelection()
+        self.cells[row][column]:decrementValue()
+        valueChanged = true
+    elseif pd.buttonJustPressed(pd.kButtonUp) then
         self.gridview:selectPreviousRow(true)
     elseif pd.buttonJustPressed(pd.kButtonDown) then
         self.gridview:selectNextRow(true)
@@ -84,7 +94,7 @@ function Board:update()
         self.gridview:selectNextColumn(true)
     end
 
-    if self.gridview.needsDisplay == true then
+    if self.gridview.needsDisplay == true or valueChanged then
         local gridviewImage = gfx.image.new(210, 210)
         gfx.pushContext(gridviewImage)
             gfx.setLineWidth(3)
