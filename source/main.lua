@@ -5,8 +5,6 @@ import "CoreLibs/timer"
 import "CoreLibs/ui"
 import "CoreLibs/sprites"
 
-import "board"
-
 local pd <const> = playdate
 local gfx <const> = playdate.graphics
 
@@ -14,9 +12,13 @@ local font = gfx.font.new('fonts/standard')
 assert(font)
 gfx.setFont(font)
 
+import "board"
+
 Board()
 
 function playdate.update()
     pd.timer.updateTimers()
     gfx.sprite.update()
+
+    pd.drawFPS(380, 10)
 end
