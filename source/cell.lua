@@ -9,30 +9,30 @@ end
 
 function Cell:incrementValue()
     if self.given then
-        return
+        return false
     end
     if self.value == 9 then
         self.value = nil
+        return false
     elseif self.value == nil then
         self.value = 1
     else
         self.value += 1
     end
+    return true
 end
 
 function Cell:decrementValue()
     if self.given then
-        return
+        return false
     end
     if self.value == 1 then
         self.value = nil
+        return false
     elseif self.value == nil then
         self.value = 9
     else
         self.value -= 1
     end
-end
-
-function Cell:getStringValue()
-    return self.value and tostring(self.value) or nil
+    return true
 end
