@@ -3,8 +3,11 @@ local gfx <const> = pd.graphics
 
 import "cell"
 
+local cellSize = 23
+
 local unselectedImages = {}
 local selectedImages = {}
+
 for i = 1,9 do
     local value = tostring(i)
 
@@ -22,10 +25,88 @@ for i = 1,9 do
     unselectedImages[i] = unselectedImage
 end
 
+local function drawCell(cellSize, edgeRight, edgeBottom, selected, valueImage)
+    local image = gfx.image.new(cellSize + 1, cellSize + 1)
+    gfx.pushContext(image)
+        gfx.setLineWidth(3)
+        if edgeBottom then
+            gfx.drawLine(0, cellSize - 1, cellSize, cellSize - 1)
+        end
+        if edgeRight then
+            gfx.drawLine(cellSize - 1, 0, cellSize - 1, cellSize)
+        end
+
+        gfx.setLineWidth(1)
+        if not edgeBottom then
+            gfx.drawLine(0, cellSize - 1, cellSize, cellSize - 1)
+        end
+        if not edgeRight then
+            gfx.drawLine(cellSize - 1, 0, cellSize - 1, cellSize)
+        end
+
+        if selected then
+            gfx.fillRect(0, 0, cellSize - 1, cellSize - 1)
+        end
+
+        if valueImage then
+            local textScale = 2
+
+            imageX, imageY = valueImage:getSize()
+            scaledX = imageX * textScale
+            scaledY = imageY * textScale
+
+            offsetX = (cellSize - scaledX) / 2
+            offsetY = (cellSize - scaledY) / 2
+
+            valueImage:drawScaled(offsetX - 1, offsetY - 1, textScale)
+        end
+    gfx.popContext()
+
+    return image
+end
+
+local standardSelectedImages = {}
+local standardUnselectedImages = {}
+
+local rightEdgeSelectedImages = {}
+local rightEdgeUnselectedImages = {}
+
+local bottomEdgeSelectedImages = {}
+local bottomEdgeUnselectedImages = {}
+
+local cornerSelectedImages = {}
+local cornerUnselectedImages = {}
+
+for i = 1,9 do
+    standardSelectedImages[i] = drawCell(cellSize, false, false, true, selectedImages[i])
+    standardUnselectedImages[i] = drawCell(cellSize, false, false, false, unselectedImages[i])
+
+    rightEdgeSelectedImages[i] = drawCell(cellSize, true, false, true, selectedImages[i])
+    rightEdgeUnselectedImages[i] = drawCell(cellSize, true, false, false, unselectedImages[i])
+
+    bottomEdgeSelectedImages[i] = drawCell(cellSize, false, true, true, selectedImages[i])
+    bottomEdgeUnselectedImages[i] = drawCell(cellSize, false, true, false, unselectedImages[i])
+
+    cornerSelectedImages[i] = drawCell(cellSize, true, true, true, selectedImages[i])
+    cornerUnselectedImages[i] = drawCell(cellSize, true, true, false, unselectedImages[i])
+end
+
+standardSelectedImages['blank'] = drawCell(cellSize, false, false, true)
+standardUnselectedImages['blank'] = drawCell(cellSize, false, false, false)
+
+rightEdgeSelectedImages['blank'] = drawCell(cellSize, true, false, true)
+rightEdgeUnselectedImages['blank'] = drawCell(cellSize, true, false, false)
+
+bottomEdgeSelectedImages['blank'] = drawCell(cellSize, false, true, true)
+bottomEdgeUnselectedImages['blank'] = drawCell(cellSize, false, true, false)
+
+cornerSelectedImages['blank'] = drawCell(cellSize, true, true, true)
+cornerUnselectedImages['blank'] = drawCell(cellSize, true, true, false)
+
 class('Board').extends(gfx.sprite)
 
 function Board:init(puzzlePath)
-    self.gridview = pd.ui.gridview.new(23, 23)
+    self.gridview = pd.ui.gridview.new(cellSize, cellSize)
     self.gridview.changeRowOnColumnWrap = false
     self.gridview:setNumberOfColumns(9)
     self.gridview:setNumberOfRows(9)
@@ -47,46 +128,39 @@ function Board:init(puzzlePath)
 
     local cells = self.cells
     function self.gridview:drawCell(section, row, column, selected, x, y, width, height)
-        local bottomLine = {x, y + height - 1, x + width, y + height - 1}
-        local rightLine = {x + width - 1, y, x + width - 1, y + height}
-
-        gfx.setLineWidth(3)
-
-        if (row % 3) == 0 and row ~= 9 then
-            gfx.drawLine(table.unpack(bottomLine))
-        end
-        if (column % 3) == 0 and column ~= 9 then
-            gfx.drawLine(table.unpack(rightLine))
+        value = cells[row][column].value
+        if not value then
+            value = 'blank'
         end
 
-        gfx.setLineWidth(1)
-
-        if (row % 3) ~= 0 then
-            gfx.drawLine(table.unpack(bottomLine))
+        image = nil
+        if (row % 3) == 0 and (column % 3) == 0 then
+            if selected then
+                image = cornerSelectedImages[value]
+            else
+                image = cornerUnselectedImages[value]
+            end
+        elseif (row % 3) == 0 then
+            if selected then
+                image = bottomEdgeSelectedImages[value]
+            else
+                image = bottomEdgeUnselectedImages[value]
+            end
+        elseif (column % 3) == 0 then
+            if selected then
+                image = rightEdgeSelectedImages[value]
+            else
+                image = rightEdgeUnselectedImages[value]
+            end
+        else
+            if selected then
+                image = standardSelectedImages[value]
+            else
+                image = standardUnselectedImages[value]
+            end
         end
-        if (column % 3) ~= 0 then
-            gfx.drawLine(table.unpack(rightLine))
-        end
 
-        if selected then
-            gfx.fillRect(x, y, width - 1, height - 1)
-        end
-
-        local value = cells[row][column].value
-        if value then
-            local valueImage = selected and selectedImages[value] or unselectedImages[value]
-
-            local textScale = 2
-
-            imageX, imageY = valueImage:getSize()
-            scaledX = imageX * textScale
-            scaledY = imageY * textScale
-
-            offsetX = x + (width - scaledX) / 2
-            offsetY = y + (height - scaledY) / 2
-
-            valueImage:drawScaled(offsetX - 1, offsetY - 1, textScale)
-        end
+        image:draw(x - 1, y - 1)
     end
 
     self:setCenter(0, 0)
@@ -121,7 +195,7 @@ function Board:update()
             gfx.setLineWidth(3)
             gfx.setStrokeLocation(gfx.kStrokeInside)
             gfx.drawRect(0, 0, 210, 210)
-            self.gridview:drawInRect(2, 2, 207, 207)
+            self.gridview:drawInRect(3, 3, 207, 207)
         gfx.popContext()
 
         self:setImage(gridviewImage)

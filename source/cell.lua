@@ -13,7 +13,6 @@ function Cell:incrementValue()
     end
     if self.value == 9 then
         self.value = nil
-        return false
     elseif self.value == nil then
         self.value = 1
     else
@@ -28,7 +27,6 @@ function Cell:decrementValue()
     end
     if self.value == 1 then
         self.value = nil
-        return false
     elseif self.value == nil then
         self.value = 9
     else
