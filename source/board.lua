@@ -2,35 +2,22 @@ local pd <const> = playdate
 local gfx <const> = pd.graphics
 
 import "cell"
-
-local unselectedImages = {}
-local selectedImages = {}
-for i = 1,9 do
-    local value = tostring(i)
-
-    local selectedImage = gfx.image.new(gfx.getTextSize(value))
-    gfx.pushContext(selectedImage)
-        gfx.setImageDrawMode(playdate.graphics.kDrawModeFillWhite)
-        gfx.drawText(value, 0, 0)
-    gfx.popContext()
-    selectedImages[i] = selectedImage
-
-    local unselectedImage = gfx.image.new(gfx.getTextSize(value))
-    gfx.pushContext(unselectedImage)
-        gfx.drawText(value, 0, 0)
-    gfx.popContext()
-    unselectedImages[i] = unselectedImage
-end
+import "util/cellImages"
 
 class('Board').extends(gfx.sprite)
 
+Board.size = 210
+Board.cellSize = 23
+Board.textScale = 2
+Board.cellImages = getCellImages(Board.cellSize, Board.textScale)
+
 function Board:init(puzzlePath)
-    self.gridview = pd.ui.gridview.new(23, 23)
+    self.gridview = pd.ui.gridview.new(Board.cellSize, Board.cellSize)
     self.gridview.changeRowOnColumnWrap = false
     self.gridview:setNumberOfColumns(9)
     self.gridview:setNumberOfRows(9)
 
-    rawPuzzle = json.decodeFile('puzzles/1.json')
+    rawPuzzle = json.decodeFile(puzzlePath)
 
     self.cells = {}
     for i = 1,9 do
@@ -47,46 +34,21 @@ function Board:init(puzzlePath)
 
     local cells = self.cells
     function self.gridview:drawCell(section, row, column, selected, x, y, width, height)
-        local bottomLine = {x, y + height - 1, x + width, y + height - 1}
-        local rightLine = {x + width - 1, y, x + width - 1, y + height}
+        value = cells[row][column].value or 'blank'
+        images = selected and Board.cellImages.selected or Board.cellImages.unselected
 
-        gfx.setLineWidth(3)
-
-        if (row % 3) == 0 and row ~= 9 then
-            gfx.drawLine(table.unpack(bottomLine))
-        end
-        if (column % 3) == 0 and column ~= 9 then
-            gfx.drawLine(table.unpack(rightLine))
-        end
-
-        gfx.setLineWidth(1)
-
-        if (row % 3) ~= 0 then
-            gfx.drawLine(table.unpack(bottomLine))
-        end
-        if (column % 3) ~= 0 then
-            gfx.drawLine(table.unpack(rightLine))
+        image = nil
+        if (row % 3) == 0 and (column % 3) == 0 then
+            image = images.corner[value]
+        elseif (row % 3) == 0 then
+            image = images.bottomEdge[value]
+        elseif (column % 3) == 0 then
+            image = images.rightEdge[value]
+        else
+            image = images.standard[value]
         end
 
-        if selected then
-            gfx.fillRect(x, y, width - 1, height - 1)
-        end
-
-        local value = cells[row][column].value
-        if value then
-            local valueImage = selected and selectedImages[value] or unselectedImages[value]
-
-            local textScale = 2
-
-            imageX, imageY = valueImage:getSize()
-            scaledX = imageX * textScale
-            scaledY = imageY * textScale
-
-            offsetX = x + (width - scaledX) / 2
-            offsetY = y + (height - scaledY) / 2
-
-            valueImage:drawScaled(offsetX - 1, offsetY - 1, textScale)
-        end
+        image:draw(x - 1, y - 1)
     end
 
     self:setCenter(0, 0)
@@ -116,12 +78,12 @@ function Board:update()
     end
 
     if self.gridview.needsDisplay == true or valueChanged then
-        local gridviewImage = gfx.image.new(210, 210)
+        local gridviewImage = gfx.image.new(Board.size, Board.size)
         gfx.pushContext(gridviewImage)
             gfx.setLineWidth(3)
             gfx.setStrokeLocation(gfx.kStrokeInside)
-            gfx.drawRect(0, 0, 210, 210)
-            self.gridview:drawInRect(2, 2, 207, 207)
+            gfx.drawRect(0, 0, Board.size, Board.size)
+            self.gridview:drawInRect(3, 3, Board.size - 3, Board.size - 3)
         gfx.popContext()
 
         self:setImage(gridviewImage)

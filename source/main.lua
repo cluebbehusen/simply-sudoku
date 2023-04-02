@@ -14,7 +14,7 @@ gfx.setFont(font)
 
 import "board"
 
-Board()
+Board('puzzles/1.json')
 
 function playdate.update()
     pd.timer.updateTimers()
