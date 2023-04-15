@@ -65,13 +65,13 @@ function Board:update()
     elseif pd.buttonJustPressed(pd.kButtonB) then
         valueChanged = self.cells[row][column]:decrementValue()
     elseif pd.buttonJustPressed(pd.kButtonUp) then
-        self.gridview:selectPreviousRow(true)
+        self.gridview:selectPreviousRow(true, false, false)
     elseif pd.buttonJustPressed(pd.kButtonDown) then
-        self.gridview:selectNextRow(true)
+        self.gridview:selectNextRow(true, false, false)
     elseif pd.buttonJustPressed(pd.kButtonLeft) then
-        self.gridview:selectPreviousColumn(true)
+        self.gridview:selectPreviousColumn(true, false, false)
     elseif pd.buttonJustPressed(pd.kButtonRight) then
-        self.gridview:selectNextColumn(true)
+        self.gridview:selectNextColumn(true, false, false)
     end
 
     if valueChanged then
