@@ -6,10 +6,9 @@ import "util/cellImages"
 
 class('Board').extends(gfx.sprite)
 
-Board.size = 210
-Board.cellSize = 23
-Board.textScale = 2
-Board.cellImages = getCellImages(Board.cellSize, Board.textScale)
+Board.size = 219
+Board.cellSize = 24
+Board.cellImages = getCellImages(Board.cellSize)
 
 function Board:init(puzzlePath)
     self.gridview = pd.ui.gridview.new(Board.cellSize, Board.cellSize)
@@ -35,7 +34,9 @@ function Board:init(puzzlePath)
     local cells = self.cells
     function self.gridview:drawCell(section, row, column, selected, x, y, width, height)
         value = cells[row][column].value or 'blank'
-        images = selected and Board.cellImages.selected or Board.cellImages.unselected
+        given = cells[row][column].given
+        selectedImages = selected and Board.cellImages.selected or Board.cellImages.unselected
+        images = given and selectedImages.given or selectedImages.input
 
         image = nil
         if (row % 3) == 0 and (column % 3) == 0 then
@@ -52,7 +53,7 @@ function Board:init(puzzlePath)
     end
 
     self:setCenter(0, 0)
-    self:moveTo(20, 15)
+    self:moveTo(20, 10)
     self:add()
 end
 
