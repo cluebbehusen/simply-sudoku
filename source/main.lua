@@ -8,9 +8,13 @@ import "CoreLibs/sprites"
 local pd <const> = playdate
 local gfx <const> = playdate.graphics
 
-local font = gfx.font.new('fonts/standard')
-assert(font)
-gfx.setFont(font)
+local fontPaths = {
+    [gfx.font.kVariantNormal] = "fonts/normal",
+    [gfx.font.kVariantBold] = "fonts/bold",
+}
+local fontFamily = gfx.font.newFamily(fontPaths)
+assert(fontFamily)
+gfx.setFontFamily(fontFamily)
 
 import "board"
 
