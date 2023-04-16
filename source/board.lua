@@ -2,92 +2,110 @@ local pd <const> = playdate
 local gfx <const> = pd.graphics
 
 import "cell"
-import "util/cellImages"
+import "util/boardImage"
 
 class('Board').extends(gfx.sprite)
 
-Board.size = 219
-Board.cellSize = 24
-Board.cellImages = getCellImages(Board.cellSize)
+Board.size = Cell.size * 9 + 10
+Board.image = getBoardImage(Board.size, Cell.size)
 
-function Board:init(puzzlePath)
-    self.gridview = pd.ui.gridview.new(Board.cellSize, Board.cellSize)
-    self.gridview.changeRowOnColumnWrap = false
-    self.gridview:setNumberOfColumns(9)
-    self.gridview:setNumberOfRows(9)
-
+function Board:init(x, y, puzzlePath)
     rawPuzzle = json.decodeFile(puzzlePath)
 
+    self.selRow = 1
+    self.selColumn = 1
+
     self.cells = {}
-    for i = 1,9 do
-        self.cells[i] = {}
-        for j = 1,9 do
-            local value = rawPuzzle[i][j]
+    for row = 1,9 do
+        self.cells[row] = {}
+        for column = 1,9 do
+            local value = rawPuzzle[row][column]
+            local offsetX = x + 2 + (column - 1) * (Cell.size + 1)
+            local offsetY = y + 2 + (row - 1) * (Cell.size + 1)
             if value ~= 0 then
-                self.cells[i][j] = Cell(i, j, value, true)
+                self.cells[row][column] = Cell(offsetX, offsetY, value, true)
             else
-                self.cells[i][j] = Cell(i, j, nil, false)
+                self.cells[row][column] = Cell(offsetX, offsetY, nil, false)
             end
         end
     end
 
-    local cells = self.cells
-    function self.gridview:drawCell(section, row, column, selected, x, y, width, height)
-        value = cells[row][column].value or 'blank'
-        given = cells[row][column].given
-        selectedImages = selected and Board.cellImages.selected or Board.cellImages.unselected
-        images = given and selectedImages.given or selectedImages.input
-
-        image = nil
-        if (row % 3) == 0 and (column % 3) == 0 then
-            image = images.corner[value]
-        elseif (row % 3) == 0 then
-            image = images.bottomEdge[value]
-        elseif (column % 3) == 0 then
-            image = images.rightEdge[value]
-        else
-            image = images.standard[value]
-        end
-
-        image:draw(x - 1, y - 1)
-    end
+    self.cells[self.selRow][self.selColumn]:setSelected()
 
     self:setCenter(0, 0)
-    self:moveTo(20, 10)
+    self:setImage(Board.image)
+    self:moveTo(x, y)
     self:add()
+end
+
+function Board:selectNextRow()
+    self.cells[self.selRow][self.selColumn]:setUnselected()
+    if self.selRow == 9 then
+        self.selRow = 0
+    else
+        self.selRow += 1
+    end
+    self.cells[self.selRow][self.selColumn]:setSelected()
+end
+
+function Board:selectNextRow()
+    self.cells[self.selRow][self.selColumn]:setUnselected()
+    if self.selRow == 9 then
+        self.selRow = 1
+    else
+        self.selRow += 1
+    end
+    self.cells[self.selRow][self.selColumn]:setSelected()
+end
+
+function Board:selectPrevRow()
+    self.cells[self.selRow][self.selColumn]:setUnselected()
+    if self.selRow == 1 then
+        self.selRow = 9
+    else
+        self.selRow -= 1
+    end
+    self.cells[self.selRow][self.selColumn]:setSelected()
+end
+
+function Board:selectNextColumn()
+    self.cells[self.selRow][self.selColumn]:setUnselected()
+    if self.selColumn == 9 then
+        self.selColumn = 1
+    else
+        self.selColumn += 1
+    end
+    self.cells[self.selRow][self.selColumn]:setSelected()
+end
+
+function Board:selectPrevColumn()
+    self.cells[self.selRow][self.selColumn]:setUnselected()
+    if self.selColumn == 1 then
+        self.selColumn = 9
+    else
+        self.selColumn -= 1
+    end
+    self.cells[self.selRow][self.selColumn]:setSelected()
 end
 
 function Board:update()
     local valueChanged = false
-    local _, row, column = self.gridview:getSelection()
     if pd.buttonJustPressed(pd.kButtonA) then
-        valueChanged = self.cells[row][column]:incrementValue()
+        valueChanged = self.cells[self.selRow][self.selColumn]:incrementValue()
     elseif pd.buttonJustPressed(pd.kButtonB) then
-        valueChanged = self.cells[row][column]:decrementValue()
+        valueChanged = self.cells[self.selRow][self.selColumn]:decrementValue()
     elseif pd.buttonJustPressed(pd.kButtonUp) then
-        self.gridview:selectPreviousRow(true, false, false)
+        self:selectPrevRow()
     elseif pd.buttonJustPressed(pd.kButtonDown) then
-        self.gridview:selectNextRow(true, false, false)
+        self:selectNextRow()
     elseif pd.buttonJustPressed(pd.kButtonLeft) then
-        self.gridview:selectPreviousColumn(true, false, false)
+        self:selectPrevColumn()
     elseif pd.buttonJustPressed(pd.kButtonRight) then
-        self.gridview:selectNextColumn(true, false, false)
+        self:selectNextColumn()
     end
 
     if valueChanged then
         print(self:isSolved())
-    end
-
-    if self.gridview.needsDisplay == true or valueChanged then
-        local gridviewImage = gfx.image.new(Board.size, Board.size)
-        gfx.pushContext(gridviewImage)
-            gfx.setLineWidth(3)
-            gfx.setStrokeLocation(gfx.kStrokeInside)
-            gfx.drawRect(0, 0, Board.size, Board.size)
-            self.gridview:drawInRect(3, 3, Board.size - 3, Board.size - 3)
-        gfx.popContext()
-
-        self:setImage(gridviewImage)
     end
 end
 
@@ -105,7 +123,7 @@ end
 
 function Board:checkColumn(column)
     local values = {}
-    for i = 1, 9 do
+    for i = 1,9 do
         local value = self.cells[i][column].value
         if not value or values[value] then
             return false
