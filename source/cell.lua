@@ -13,6 +13,7 @@ function Cell:init(x, y, value, given)
     self.given = given
     self.selected = false
 
+    self:updateImage()
     self:setCenter(0, 0)
     self:moveTo(x, y)
     self:add()
@@ -29,6 +30,7 @@ function Cell:incrementValue()
     else
         self.value += 1
     end
+    self:updateImage()
     return true
 end
 
@@ -43,18 +45,21 @@ function Cell:decrementValue()
     else
         self.value -= 1
     end
+    self:updateImage()
     return true
 end
 
 function Cell:setSelected()
     self.selected = true
+    self:updateImage()
 end
 
 function Cell:setUnselected()
     self.selected = false
+    self:updateImage()
 end
 
-function Cell:update()
+function Cell:updateImage()
     local value = self.value or 'blank'
     local selectedImages = self.selected and Cell.images.selected or Cell.images.unselected
     local images = self.given and selectedImages.given or selectedImages.input
