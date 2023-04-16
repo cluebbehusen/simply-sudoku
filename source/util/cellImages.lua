@@ -48,27 +48,11 @@ local function getValueImages()
 end
 
 local function getCellImageWrapper(cellSize)
-    return function (edgeRight, edgeBottom, selected, valueImage)
-        local image = gfx.image.new(cellSize + 1, cellSize + 1)
+    return function (selected, valueImage)
+        local image = gfx.image.new(cellSize, cellSize)
         gfx.pushContext(image)
-            gfx.setLineWidth(3)
-            if edgeBottom then
-                gfx.drawLine(0, cellSize - 1, cellSize, cellSize - 1)
-            end
-            if edgeRight then
-                gfx.drawLine(cellSize - 1, 0, cellSize - 1, cellSize)
-            end
-
-            gfx.setLineWidth(1)
-            if not edgeBottom then
-                gfx.drawLine(0, cellSize - 1, cellSize, cellSize - 1)
-            end
-            if not edgeRight then
-                gfx.drawLine(cellSize - 1, 0, cellSize - 1, cellSize)
-            end
-
             if selected then
-                gfx.fillRect(0, 0, cellSize - 1, cellSize - 1)
+                gfx.fillRect(0, 0, cellSize, cellSize)
             end
 
             if valueImage then
@@ -84,78 +68,31 @@ local function getCellImageWrapper(cellSize)
     end
 end
 
-function getCellImages(cellSize, textScale)
+function getCellImages(cellSize)
     local images = {
         selected = {
-            given = {
-                standard = {},
-                rightEdge = {},
-                bottomEdge = {},
-                corner = {},
-            },
-            input = {
-                standard = {},
-                rightEdge = {},
-                bottomEdge = {},
-                corner = {},
-            },
+            given = {},
+            input = {},
         },
         unselected = {
-            given = {
-                standard = {},
-                rightEdge = {},
-                bottomEdge = {},
-                corner = {},
-            },
-            input = {
-                standard = {},
-                rightEdge = {},
-                bottomEdge = {},
-                corner = {},
-            },
+            given = {},
+            input = {},
         }
     }
-    local getCellImage = getCellImageWrapper(cellSize, textScale)
+    local getCellImage = getCellImageWrapper(cellSize)
     local valueImages = getValueImages()
 
     for i = 1,9 do
-        images.selected.input.standard[i] = getCellImage(false, false, true, valueImages.selected.input[i])
-        images.unselected.input.standard[i] = getCellImage(false, false, false, valueImages.unselected.input[i])
+        images.selected.input[i] = getCellImage(true, valueImages.selected.input[i])
+        images.unselected.input[i] = getCellImage(false, valueImages.unselected.input[i])
 
-        images.selected.input.rightEdge[i] = getCellImage(true, false, true, valueImages.selected.input[i])
-        images.unselected.input.rightEdge[i] = getCellImage(true, false, false, valueImages.unselected.input[i])
-
-        images.selected.input.bottomEdge[i] = getCellImage(false, true, true, valueImages.selected.input[i])
-        images.unselected.input.bottomEdge[i] = getCellImage(false, true, false, valueImages.unselected.input[i])
-
-        images.selected.input.corner[i] = getCellImage(true, true, true, valueImages.selected.input[i])
-        images.unselected.input.corner[i] = getCellImage(true, true, false, valueImages.unselected.input[i])
-
-        images.selected.given.standard[i] = getCellImage(false, false, true, valueImages.selected.given[i])
-        images.unselected.given.standard[i] = getCellImage(false, false, false, valueImages.unselected.given[i])
-
-        images.selected.given.rightEdge[i] = getCellImage(true, false, true, valueImages.selected.given[i])
-        images.unselected.given.rightEdge[i] = getCellImage(true, false, false, valueImages.unselected.given[i])
-
-        images.selected.given.bottomEdge[i] = getCellImage(false, true, true, valueImages.selected.given[i])
-        images.unselected.given.bottomEdge[i] = getCellImage(false, true, false, valueImages.unselected.given[i])
-
-        images.selected.given.corner[i] = getCellImage(true, true, true, valueImages.selected.given[i])
-        images.unselected.given.corner[i] = getCellImage(true, true, false, valueImages.unselected.given[i])
+        images.selected.given[i] = getCellImage(true, valueImages.selected.given[i])
+        images.unselected.given[i] = getCellImage(false, valueImages.unselected.given[i])
     end
 
     -- It can be assumed that any blank cell is not given, so put it in input
-    images.selected.input.standard.blank = getCellImage(false, false, true)
-    images.unselected.input.standard.blank = getCellImage(false, false, false)
-
-    images.selected.input.rightEdge.blank = getCellImage(true, false, true)
-    images.unselected.input.rightEdge.blank = getCellImage(true, false, false)
-
-    images.selected.input.bottomEdge.blank = getCellImage(false, true, true)
-    images.unselected.input.bottomEdge.blank = getCellImage(false, true, false)
-
-    images.selected.input.corner.blank = getCellImage(true, true, true)
-    images.unselected.input.corner.blank = getCellImage(true, true, false)
+    images.selected.input.blank = getCellImage(true)
+    images.unselected.input.blank = getCellImage(false)
 
     return images
 end
