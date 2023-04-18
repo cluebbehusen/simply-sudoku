@@ -1,16 +1,6 @@
 local pd <const> = playdate
 local gfx <const> = pd.graphics
 
-class("Scene").extends()
-
-function Scene:enter()
-    error("This is an abstract method. It should be implemented.")
-end
-
-function Scene:leave()
-    error("This is an abstract method. It should be implemented.")
-end
-
 class("SceneManager").extends()
 
 function SceneManager:init(startScene)
