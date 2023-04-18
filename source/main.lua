@@ -16,7 +16,7 @@ local fontFamily = gfx.font.newFamily(fontPaths)
 assert(fontFamily)
 gfx.setFontFamily(fontFamily)
 
-import "board"
+import "scenes/game/board"
 
 Board(20, 10, 'puzzles/1.json')
 
