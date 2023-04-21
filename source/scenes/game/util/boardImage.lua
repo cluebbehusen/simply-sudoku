@@ -2,7 +2,8 @@ local pd <const> = playdate
 local gfx <const> = pd.graphics
 
 function getBoardImage(boardSize, cellSize)
-    local image = gfx.image.new(boardSize + 2, boardSize + 2)
+    local paddedBoardSize = boardSize - 2
+    local image = gfx.image.new(boardSize, boardSize)
 
     gfx.pushContext(image)
         for i = 1,8 do
@@ -12,12 +13,12 @@ function getBoardImage(boardSize, cellSize)
             else
                 gfx.setLineWidth(1)
             end
-            gfx.drawLine(0, offset, boardSize, offset)
-            gfx.drawLine(offset, 0, offset, boardSize)
+            gfx.drawLine(0, offset, paddedBoardSize, offset)
+            gfx.drawLine(offset, 0, offset, paddedBoardSize)
         end
 
         gfx.setLineWidth(3)
-        gfx.drawRect(1, 1, boardSize, boardSize)
+        gfx.drawRect(1, 1, paddedBoardSize, paddedBoardSize)
     gfx.popContext()
 
     return image

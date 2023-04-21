@@ -6,7 +6,7 @@ import "util/boardImage"
 
 class("Board").extends(gfx.sprite)
 
-Board.size = Cell.size * 9 + 10
+Board.size = Cell.size * 9 + 12
 Board.image = getBoardImage(Board.size, Cell.size)
 
 function Board:init(x, y, puzzlePath)
@@ -88,34 +88,18 @@ function Board:selectPrevColumn()
     self.cells[self.selRow][self.selColumn]:setSelected()
 end
 
-function Board:AButtonDown()
+function Board:incrementSelectedCell()
     local valueChanged = self.cells[self.selRow][self.selColumn]:incrementValue()
     if valueChanged then
         print(self:isSolved())
     end
 end
 
-function Board:BButtonDown()
+function Board:decrementSelectedCell()
     local valueChanged = self.cells[self.selRow][self.selColumn]:decrementValue()
     if valueChanged then
         print(self:isSolved())
     end
-end
-
-function Board:upButtonDown()
-    self:selectPrevRow()
-end
-
-function Board:downButtonDown()
-    self:selectNextRow()
-end
-
-function Board:leftButtonDown()
-    self:selectPrevColumn()
-end
-
-function Board:rightButtonDown()
-    self:selectNextColumn()
 end
 
 function Board:checkRow(row)

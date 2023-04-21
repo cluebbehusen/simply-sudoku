@@ -10,7 +10,7 @@ end
 
 function SceneManager:emit(event, ...)
     if self.scene[event] then
-        scene[event](scene, ...)
+        self.scene[event](self.scene, ...)
     end
 end
 
@@ -22,9 +22,10 @@ function SceneManager:enter(nextScene, ...)
 end
 
 function SceneManager:hook(handlersToInclude)
+    pd.inputHandlers.pop()
     local handlers = {}
-    for _, v in pairs(to_include) do
+    for _, v in pairs(handlersToInclude) do
         handlers[v] = function(...) self:emit(v, ...) end
     end
-    pd.inputHandlers.push(handlers)
+    pd.inputHandlers.push(handlers, false)
 end
