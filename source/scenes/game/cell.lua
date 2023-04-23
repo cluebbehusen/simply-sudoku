@@ -3,7 +3,7 @@ local gfx <const> = pd.graphics
 
 import "util/cellImages"
 
-class('Cell').extends(gfx.sprite)
+class("Cell").extends(gfx.sprite)
 
 Cell.size = 23
 Cell.images = getCellImages(Cell.size)
@@ -60,7 +60,7 @@ function Cell:setUnselected()
 end
 
 function Cell:updateImage()
-    local value = self.value or 'blank'
+    local value = self.value or "blank"
     local selectedImages = self.selected and Cell.images.selected or Cell.images.unselected
     local images = self.given and selectedImages.given or selectedImages.input
 

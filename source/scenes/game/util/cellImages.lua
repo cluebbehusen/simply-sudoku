@@ -27,21 +27,21 @@ local function getValueImages()
 
         local selectedInputImage = gfx.image.new(gfx.getTextSize(value))
         drawTextImage(selectedInputImage, value, true)
-        valueImages.selected.given[i] = selectedInputImage
+        valueImages.selected.input[i] = selectedInputImage
 
         local unselectedInputImage = gfx.image.new(gfx.getTextSize(value))
         drawTextImage(unselectedInputImage, value, false)
-        valueImages.unselected.given[i] = unselectedInputImage
+        valueImages.unselected.input[i] = unselectedInputImage
 
         local boldValue = "*"..value.."*"
 
         local selectedGivenImage = gfx.image.new(gfx.getTextSize(boldValue))
         drawTextImage(selectedGivenImage, boldValue, true)
-        valueImages.selected.input[i] = selectedGivenImage
+        valueImages.selected.given[i] = selectedGivenImage
 
         local unselectedGivenImage = gfx.image.new(gfx.getTextSize(boldValue))
         drawTextImage(unselectedGivenImage, boldValue, false)
-        valueImages.unselected.input[i] = unselectedGivenImage
+        valueImages.unselected.given[i] = unselectedGivenImage
     end
 
     return valueImages

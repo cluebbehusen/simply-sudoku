@@ -16,9 +16,18 @@ local fontFamily = gfx.font.newFamily(fontPaths)
 assert(fontFamily)
 gfx.setFontFamily(fontFamily)
 
-import "board"
+import "sceneManager"
+import "scenes/game/game"
 
-Board(20, 10, 'puzzles/1.json')
+sceneManager = SceneManager(Game())
+sceneManager:hook({
+    "AButtonDown",
+    "BButtonDown",
+    "upButtonDown",
+    "downButtonDown",
+    "leftButtonDown",
+    "rightButtonDown",
+})
 
 function playdate.update()
     pd.timer.updateTimers()
