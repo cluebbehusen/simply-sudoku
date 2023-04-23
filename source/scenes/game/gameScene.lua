@@ -3,9 +3,9 @@ local gfx <const> = pd.graphics
 
 import "board"
 
-class("Game").extends()
+class("GameScene").extends()
 
-function Game:enter()
+function GameScene:enter()
     local screenHeight = pd.display.getHeight()
     local screenWidth = pd.display.getWidth()
 
@@ -15,30 +15,30 @@ function Game:enter()
     self.board = Board(boardX, boardY, 'puzzles/1.json')
 end
 
-function Game:leave()
+function GameScene:leave()
     gfx.sprite.removeAll()
 end
 
-function Game:AButtonDown()
+function GameScene:AButtonDown()
     self.board:incrementSelectedCell()
 end
 
-function Game:BButtonDown()
+function GameScene:BButtonDown()
     self.board:decrementSelectedCell()
 end
 
-function Game:upButtonDown()
+function GameScene:upButtonDown()
     self.board:selectPrevRow()
 end
 
-function Game:downButtonDown()
+function GameScene:downButtonDown()
     self.board:selectNextRow()
 end
 
-function Game:leftButtonDown()
+function GameScene:leftButtonDown()
     self.board:selectPrevColumn()
 end
 
-function Game:rightButtonDown()
+function GameScene:rightButtonDown()
     self.board:selectNextColumn()
 end

@@ -3,8 +3,8 @@ local gfx <const> = pd.graphics
 
 class("SceneManager").extends()
 
-function SceneManager:init(startScene)
-    self.scene = startScene
+function SceneManager:init(initialScene)
+    self.scene = initialScene
     self:emit("enter", nil)
 end
 
