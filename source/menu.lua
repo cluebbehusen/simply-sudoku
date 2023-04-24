@@ -1,6 +1,12 @@
 local pd <const> = playdate
 local gfx <const> = pd.graphics
 
+class("MenuItem").extends()
+
+function MenuItem:draw(selected, x, y, width, height)
+    error('This is an abstract method. It must be overwritten.')
+end
+
 class("Menu").extends()
 
 function Menu:init(initialMenuItems, x, y, width, height, cellHeight)
@@ -33,7 +39,7 @@ end
 
 function Menu:hook(handlersToInclude)
     for _, handler in pairs(handlersToInclude) do
-        if handler == "upButtonDown" or hander == "downButtonDown"
+        if handler == "upButtonDown" or hander == "downButtonDown" then
             error("upButtonDown and downButtonDown are reserved for Menu.")
         end
         self[handler] = function(...) self:emit(handler, ...) end
