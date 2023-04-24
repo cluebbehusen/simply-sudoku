@@ -10,7 +10,7 @@ Board.size = Cell.size * 9 + 12
 Board.image = getBoardImage(Board.size, Cell.size)
 
 function Board:init(x, y, puzzlePath)
-    rawPuzzle = json.decodeFile(puzzlePath)
+    local rawPuzzle = json.decodeFile(puzzlePath)
 
     self.selRow = 1
     self.selColumn = 1
@@ -42,16 +42,6 @@ function Board:selectNextRow()
     self.cells[self.selRow][self.selColumn]:setUnselected()
     if self.selRow == 9 then
         self.selRow = 0
-    else
-        self.selRow += 1
-    end
-    self.cells[self.selRow][self.selColumn]:setSelected()
-end
-
-function Board:selectNextRow()
-    self.cells[self.selRow][self.selColumn]:setUnselected()
-    if self.selRow == 9 then
-        self.selRow = 1
     else
         self.selRow += 1
     end

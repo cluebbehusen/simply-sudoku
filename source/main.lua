@@ -17,9 +17,9 @@ assert(fontFamily)
 gfx.setFontFamily(fontFamily)
 
 import "sceneManager"
-import "scenes/game/game"
+import "scenes/game/gameScene"
 
-sceneManager = SceneManager(Game())
+local sceneManager = SceneManager(GameScene())
 sceneManager:hook({
     "AButtonDown",
     "BButtonDown",
