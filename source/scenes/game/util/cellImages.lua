@@ -56,9 +56,9 @@ local function getCellImageWrapper(cellSize)
             end
 
             if valueImage then
-                imageX, imageY = valueImage:getSize()
-                offsetX = (cellSize - imageX - 1) / 2
-                offsetY = (cellSize - imageY - 1) / 2
+                local imageX, imageY = valueImage:getSize()
+                local offsetX = (cellSize - imageX - 1) / 2
+                local offsetY = (cellSize - imageY - 1) / 2
 
                 valueImage:draw(offsetX, offsetY)
             end
