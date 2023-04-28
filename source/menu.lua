@@ -7,7 +7,7 @@ function MenuItem:draw(selected, x, y, width, height)
     error('This is an abstract method. It must be overwritten.')
 end
 
-class("Menu").extends()
+class("Menu").extends(gfx.sprite)
 
 function Menu:init(initialMenuItems, x, y, width, height, cellHeight)
     self.stack = {}
@@ -19,6 +19,10 @@ function Menu:init(initialMenuItems, x, y, width, height, cellHeight)
     self.height = height
 
     self.gridview = pd.ui.gridview.new(0, cellHeight)
+
+    self:setCenter(0, 0)
+    self:moveTo(x, y)
+    self:add()
 end
 
 function Menu:pushMenuItems(menuItems)
@@ -52,5 +56,15 @@ function Menu:emit(event, ...)
 
     if selectedMenuItem[event] then
         selectedMenuItem[event](selectedMenuItem, self, ...)
+    end
+end
+
+function Menu:update()
+    if self.gridview.needsDisplay then
+        local menuImage = gfx.image.new(self.width, self.height)
+        gfx.pushContext(menuImage)
+            self.gridview:drawInRect(0, 0, self.width, self.height)
+        gfx.popContext()
+        self:setImage(menuImage)
     end
 end
