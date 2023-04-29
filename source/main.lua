@@ -22,11 +22,17 @@ import "scenes/game/gameScene"
 local sceneManager = SceneManager(GameScene())
 sceneManager:hook({
     "AButtonDown",
+    "AButtonUp",
     "BButtonDown",
+    "BButtonUp",
     "upButtonDown",
+    "upButtonUp",
     "downButtonDown",
+    "downButtonUp",
     "leftButtonDown",
+    "leftButtonUp",
     "rightButtonDown",
+    "rightButtonUp",
 })
 
 function playdate.update()
