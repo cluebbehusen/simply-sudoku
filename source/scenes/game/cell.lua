@@ -60,8 +60,8 @@ function Cell:setUnselected()
 end
 
 function Cell:updateImage()
-    local imageName = getImageName(self.selected, self.specified, self.value)
-    local image = Cell.images[imageName]
+    local imageKey = getImageKey(self.specified, self.value)
+    local image = self.selected and Cell.images[imageKey]:invertedImage() or Cell.images[imageKey]
 
     self:setImage(image)
 end

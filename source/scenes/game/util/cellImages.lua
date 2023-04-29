@@ -1,25 +1,22 @@
 local pd <const> = playdate
 local gfx <const> = pd.graphics
 
-function getImageName(selected, specified, value)
-    local selectedString = selected and "selected" or "unselected"
+function getImageKey(specified, value)
     local specifiedString = specified and "specified" or "unspecified"
     if value ~= nil then
         local valueString = tostring(value)
-        return selectedString.."-"..specifiedString.."-"..valueString
+        return specifiedString.."-"..valueString
     end
-    return selectedString.."-"..specifiedString
+    return specifiedString
 end
 
 local function getCellImageWrapper(cellSize)
-    return function (selected, specified, value)
+    return function (specified, value)
         local image = gfx.image.new(cellSize, cellSize)
 
         gfx.pushContext(image)
-        if selected then
-            gfx.fillRect(0, 0, cellSize, cellSize)
-            gfx.setImageDrawMode(playdate.graphics.kDrawModeFillWhite)
-        end
+        gfx.setColor(gfx.kColorWhite)
+        gfx.fillRect(0, 0, cellSize, cellSize)
 
         if value ~= nil then
             local valueString = specified and "*"..tostring(value).."*" or tostring(value)
@@ -35,38 +32,16 @@ local function getCellImageWrapper(cellSize)
     end
 end
 
-local function valuesGenWrapper(choices, n)
-    local function valuesGen(accum)
-        if #accum == n then
-            coroutine.yield(accum)
-        else
-            for i, v in ipairs(choices) do
-                local updatedAccum = {table.unpack(accum)}
-                table.insert(updatedAccum, v)
-                valuesGen(updatedAccum)
-            end
-        end
-    end
-
-    return valuesGen
-end
-
-local function values(choices, n)
-    local valuesGen = valuesGenWrapper(choices, n)
-
-    return coroutine.wrap(function() valuesGen({}) end)
-end
-
 function getCellImages(cellSize)
     local images = {}
     local getCellImage = getCellImageWrapper(cellSize)
 
-    for value in values({true, false}, 2) do
-        for i = 1,9 do
-            images[getImageName(value[1], value[2], i)] = getCellImage(value[1], value[2], i)
-        end
-        images[getImageName(value[1], value[2])] = getCellImage(value[1], value[2])
+    for i = 1,9 do
+        images[getImageKey(true, i)] = getCellImage(true, i)
+        images[getImageKey(false, i)] = getCellImage(false, i)
     end
+    images[getImageKey(true)] = getCellImage(true)
+    images[getImageKey(false)] = getCellImage(false)
 
     return images
 end

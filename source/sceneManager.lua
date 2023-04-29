@@ -10,7 +10,7 @@ end
 
 function SceneManager:emit(event, ...)
     if self.scene[event] then
-        self.scene[event](self.scene, ...)
+        self.scene[event](self.scene, self, ...)
     end
 end
 
