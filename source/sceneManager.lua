@@ -24,7 +24,7 @@ end
 function SceneManager:hook(handlersToInclude)
     pd.inputHandlers.pop()
     local handlers = {}
-    for _, v in pairs(handlersToInclude) do
+    for _, v in ipairs(handlersToInclude) do
         handlers[v] = function(...) self:emit(v, ...) end
     end
     pd.inputHandlers.push(handlers, false)

@@ -7,7 +7,8 @@ import "util/boardImage"
 class("Board").extends(gfx.sprite)
 
 Board.size = Cell.size * 9 + 12
-Board.image = getBoardImage(Board.size, Cell.size)
+
+writeBoardImage(Board.size, Cell.size)
 
 function Board:init(x, y, puzzlePath)
     local rawPuzzle = json.decodeFile(puzzlePath)
@@ -33,7 +34,7 @@ function Board:init(x, y, puzzlePath)
     self.cells[self.selRow][self.selColumn]:setSelected()
 
     self:setCenter(0, 0)
-    self:setImage(Board.image)
+    self:setImage(pd.datastore.readImage("board"))
     self:moveTo(x, y)
     self:add()
 end
@@ -41,7 +42,7 @@ end
 function Board:selectNextRow()
     self.cells[self.selRow][self.selColumn]:setUnselected()
     if self.selRow == 9 then
-        self.selRow = 0
+        self.selRow = 1
     else
         self.selRow += 1
     end
