@@ -3,7 +3,7 @@ local gfx <const> = pd.graphics
 
 function getImageKey(specified, value)
     local specifiedString = specified and "specified" or "unspecified"
-    if value ~= nil then
+    if value then
         local valueString = tostring(value)
         return specifiedString.."-"..valueString
     end
@@ -18,7 +18,7 @@ local function getCellImageWrapper(cellSize)
         gfx.setColor(gfx.kColorWhite)
         gfx.fillRect(0, 0, cellSize, cellSize)
 
-        if value ~= nil then
+        if value then
             local valueString = specified and "*"..tostring(value).."*" or tostring(value)
             local textWidth, textHeight = gfx.getTextSize(valueString)
             local offsetX = (cellSize - textWidth - 1) / 2
