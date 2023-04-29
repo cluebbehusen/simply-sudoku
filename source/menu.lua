@@ -42,7 +42,7 @@ function Menu:downButtonDown()
 end
 
 function Menu:hook(handlersToInclude)
-    for _, handler in pairs(handlersToInclude) do
+    for _, handler in ipairs(handlersToInclude) do
         if handler == "upButtonDown" or hander == "downButtonDown" then
             error("upButtonDown and downButtonDown are reserved for Menu.")
         end
@@ -62,9 +62,11 @@ end
 function Menu:update()
     if self.gridview.needsDisplay then
         local menuImage = gfx.image.new(self.width, self.height)
+
         gfx.pushContext(menuImage)
-            self.gridview:drawInRect(0, 0, self.width, self.height)
+        self.gridview:drawInRect(0, 0, self.width, self.height)
         gfx.popContext()
+
         self:setImage(menuImage)
     end
 end

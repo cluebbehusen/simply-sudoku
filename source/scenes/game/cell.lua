@@ -8,9 +8,9 @@ class("Cell").extends(gfx.sprite)
 Cell.size = 23
 Cell.images = getCellImages(Cell.size)
 
-function Cell:init(x, y, value, given)
+function Cell:init(x, y, value, specified)
     self.value = value
-    self.given = given
+    self.specified = specified
     self.selected = false
 
     self:updateImage()
@@ -20,7 +20,7 @@ function Cell:init(x, y, value, given)
 end
 
 function Cell:incrementValue()
-    if self.given then
+    if self.specified then
         return false
     end
     if self.value == 9 then
@@ -35,7 +35,7 @@ function Cell:incrementValue()
 end
 
 function Cell:decrementValue()
-    if self.given then
+    if self.specified then
         return false
     end
     if self.value == 1 then
@@ -60,9 +60,8 @@ function Cell:setUnselected()
 end
 
 function Cell:updateImage()
-    local value = self.value or "blank"
-    local selectedImages = self.selected and Cell.images.selected or Cell.images.unselected
-    local images = self.given and selectedImages.given or selectedImages.input
+    local imageKey = getImageKey(self.specified, self.value)
+    local image = Cell.images[imageKey]
 
-    self:setImage(images[value])
+    self:setImage(self.selected and image:invertedImage() or image)
 end
