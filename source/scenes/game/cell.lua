@@ -61,7 +61,7 @@ end
 
 function Cell:updateImage()
     local imageKey = getImageKey(self.specified, self.value)
-    local image = self.selected and Cell.images[imageKey]:invertedImage() or Cell.images[imageKey]
+    local image = Cell.images[imageKey]
 
-    self:setImage(image)
+    self:setImage(self.selected and image:invertedImage() or image)
 end
