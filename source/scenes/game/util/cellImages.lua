@@ -33,6 +33,15 @@ local function getCellImageWrapper(cellSize)
 end
 
 function getCellImages(cellSize)
+    local previousFont = gfx.getFont()
+
+    local fontPaths = {
+        [gfx.font.kVariantNormal] = "fonts/normalNumbers",
+        [gfx.font.kVariantBold] = "fonts/boldNumbers",
+    }
+    local fontFamily = gfx.font.newFamily(fontPaths)
+    gfx.setFontFamily(fontFamily)
+
     local images = {}
     local getCellImage = getCellImageWrapper(cellSize)
 
@@ -42,6 +51,8 @@ function getCellImages(cellSize)
     end
     images[getImageKey(true)] = getCellImage(true)
     images[getImageKey(false)] = getCellImage(false)
+
+    gfx.setFont(previousFont)
 
     return images
 end
