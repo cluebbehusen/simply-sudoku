@@ -1,6 +1,8 @@
 local pd <const> = playdate
 local gfx <const> = pd.graphics
 
+import "header"
+
 class("StartMenuItem").extends(MenuItem)
 
 function StartMenuItem:init(text)
@@ -21,7 +23,7 @@ function StartMenuItem:draw(selected, x, y, width, height)
         gfx.drawRoundRect(0, 0, width, height, 5)
     end
     gfx.drawText(self.text, offsetX, offsetY)
-    gfx.popContext(image)
+    gfx.popContext()
 
     image:draw(x, y)
 end
@@ -29,23 +31,36 @@ end
 class("StartScene").extends()
 
 StartScene.menuWidth = 150
-StartScene.menuHeight = 100
-StartScene.menuItemHeight = 55
+StartScene.menuItemHeight = 33
+StartScene.menuItemPadding = 4
+StartScene.headerY = 50
 
-function StartScene:enter()
+function StartScene:enter(sceneManager)
+    self.sceneManager = sceneManager
+
     local screenHeight = pd.display.getHeight()
     local screenWidth = pd.display.getWidth()
 
+    local continuePuzzleMenuItem = StartMenuItem("Continue Puzzle")
+    function continuePuzzleMenuItem:AButtonDown()
+        sceneManager:enter("game")
+    end
+
+    local menuItems = { continuePuzzleMenuItem, StartMenuItem("Select Puzzle"), StartMenuItem("Tutorial") }
+
+    local menuHeight = #menuItems * (StartScene.menuItemHeight + StartScene.menuItemPadding * 2)
+
     local menuX = (screenWidth - StartScene.menuWidth) / 2
-    local menuY = (screenHeight - StartScene.menuHeight) / 2
+    local menuY = (screenHeight - menuHeight) / 2 + 32
 
-    local menuItems = {StartMenuItem("Placeholder")}
-
-    self.menu = Menu(menuItems, menuX, menuY, StartScene.menuWidth, StartScene.menuHeight, StartScene.menuItemHeight)
+    self.menu = Menu(menuItems, menuX, menuY, StartScene.menuWidth, menuHeight, StartScene.menuItemHeight,
+        StartScene.menuItemPadding)
     self.menu:hook({
         "AButtonDown",
         "BButtonDown",
     })
+
+    Header(StartScene.headerY)
 end
 
 function StartScene:leave()

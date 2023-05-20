@@ -15,7 +15,12 @@ import "sceneManager"
 import "scenes/game/gameScene"
 import "scenes/start/startScene"
 
-local sceneManager = SceneManager(StartScene())
+local scenes = {
+    game = GameScene(),
+    start = StartScene()
+}
+
+local sceneManager = SceneManager(scenes, "start")
 sceneManager:hook({
     "AButtonDown",
     "AButtonUp",

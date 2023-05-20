@@ -9,14 +9,14 @@ end
 
 class("Menu").extends(gfx.sprite)
 
-function Menu:init(initialMenuItems, x, y, width, height, cellHeight)
+function Menu:init(initialMenuItems, x, y, width, height, cellHeight, cellPadding)
     self.x = x
     self.y = y
     self.gridviewWidth = width
     self.gridviewHeight = height
 
     self.gridview = pd.ui.gridview.new(0, cellHeight)
-    self.gridview:setCellPadding(0, 0, 5, 5)
+    self.gridview:setCellPadding(0, 0, cellPadding, cellPadding)
 
     self.stack = {}
     self:pushMenuItems(initialMenuItems)

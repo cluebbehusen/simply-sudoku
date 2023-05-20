@@ -19,6 +19,15 @@ end
 
 function GameScene:leave()
     gfx.sprite.removeAll()
+    local allTimers = pd.timer.allTimers()
+
+    if not allTimers then
+        return
+    end
+
+    for _, timer in ipairs(allTimers) do
+        timer:remove()
+    end
 end
 
 function GameScene:removeTimer(name)
