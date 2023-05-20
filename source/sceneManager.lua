@@ -3,8 +3,9 @@ local gfx <const> = pd.graphics
 
 class("SceneManager").extends()
 
-function SceneManager:init(initialScene)
-    self.scene = initialScene
+function SceneManager:init(scenes, initialSceneKey)
+    self.scenes = scenes
+    self.scene = scenes[initialSceneKey]
     self:emit("enter", nil)
 end
 
@@ -14,8 +15,9 @@ function SceneManager:emit(event, ...)
     end
 end
 
-function SceneManager:enter(nextScene, ...)
+function SceneManager:enter(nextSceneKey, ...)
     local previousScene = self.scene
+    local nextScene = self.scenes[nextSceneKey]
     self:emit("leave", nextScene, ...)
     self.scene = nextScene
     self:emit("enter", previousScene, ...)

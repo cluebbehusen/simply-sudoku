@@ -6,7 +6,7 @@ function writeBoardImage(boardSize, cellSize)
     local image = gfx.image.new(boardSize, boardSize)
 
     gfx.pushContext(image)
-    for i = 1,8 do
+    for i = 1, 8 do
         local offset = 1 + i * (cellSize + 1)
         if i % 3 == 0 then
             gfx.setLineWidth(3)

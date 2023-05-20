@@ -9,16 +9,24 @@ end
 
 class("Menu").extends(gfx.sprite)
 
-function Menu:init(initialMenuItems, x, y, width, height, cellHeight)
+function Menu:init(initialMenuItems, x, y, width, height, cellHeight, cellPadding)
+    self.x = x
+    self.y = y
+    self.gridviewWidth = width
+    self.gridviewHeight = height
+
+    self.gridview = pd.ui.gridview.new(0, cellHeight)
+    self.gridview:setCellPadding(0, 0, cellPadding, cellPadding)
+
     self.stack = {}
     self:pushMenuItems(initialMenuItems)
 
-    self.x = x
-    self.y = y
-    self.width = width
-    self.height = height
+    local stack = self.stack
+    function self.gridview:drawCell(section, row, column, selected, x, y, width, height)
+        local menuItem = stack[#stack][row]
 
-    self.gridview = pd.ui.gridview.new(0, cellHeight)
+        menuItem:draw(selected, x, y, width, height)
+    end
 
     self:setCenter(0, 0)
     self:moveTo(x, y)
@@ -27,10 +35,16 @@ end
 
 function Menu:pushMenuItems(menuItems)
     table.insert(self.stack, menuItems)
+    self.gridview:setNumberOfRows(#self.stack[#self.stack])
 end
 
 function Menu:popMenuItems()
+    if #self.stack == 1 then
+        return
+    end
+
     table.remove(self.stack)
+    self.gridview:setNumberOfRows(#self.stack[#self.stack])
 end
 
 function Menu:upButtonDown()
@@ -61,10 +75,10 @@ end
 
 function Menu:update()
     if self.gridview.needsDisplay then
-        local menuImage = gfx.image.new(self.width, self.height)
+        local menuImage = gfx.image.new(self.gridviewWidth, self.gridviewHeight)
 
         gfx.pushContext(menuImage)
-        self.gridview:drawInRect(0, 0, self.width, self.height)
+        self.gridview:drawInRect(0, 0, self.gridviewWidth, self.gridviewHeight)
         gfx.popContext()
 
         self:setImage(menuImage)

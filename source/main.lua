@@ -8,18 +8,19 @@ import "CoreLibs/sprites"
 local pd <const> = playdate
 local gfx <const> = playdate.graphics
 
-local fontPaths = {
-    [gfx.font.kVariantNormal] = "fonts/normal",
-    [gfx.font.kVariantBold] = "fonts/bold",
-}
-local fontFamily = gfx.font.newFamily(fontPaths)
-assert(fontFamily)
-gfx.setFontFamily(fontFamily)
+gfx.setFont(gfx.font.new("fonts/system"))
 
+import "menu"
 import "sceneManager"
 import "scenes/game/gameScene"
+import "scenes/start/startScene"
 
-local sceneManager = SceneManager(GameScene())
+local scenes = {
+    game = GameScene(),
+    start = StartScene()
+}
+
+local sceneManager = SceneManager(scenes, "start")
 sceneManager:hook({
     "AButtonDown",
     "AButtonUp",

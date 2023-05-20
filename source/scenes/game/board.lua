@@ -17,9 +17,9 @@ function Board:init(x, y, puzzlePath)
     self.selColumn = 1
 
     self.cells = {}
-    for row = 1,9 do
+    for row = 1, 9 do
         self.cells[row] = {}
-        for column = 1,9 do
+        for column = 1, 9 do
             local value = rawPuzzle[row][column]
             local offsetX = x + 2 + (column - 1) * (Cell.size + 1)
             local offsetY = y + 2 + (row - 1) * (Cell.size + 1)
@@ -95,7 +95,7 @@ end
 
 function Board:checkRow(row)
     local values = {}
-    for j = 1,9 do
+    for j = 1, 9 do
         local value = self.cells[row][j].value
         if not value or values[value] then
             return false
@@ -107,7 +107,7 @@ end
 
 function Board:checkColumn(column)
     local values = {}
-    for i = 1,9 do
+    for i = 1, 9 do
         local value = self.cells[i][column].value
         if not value or values[value] then
             return false
@@ -134,20 +134,20 @@ function Board:checkBlock(blockRow, blockColumn)
 end
 
 function Board:isSolved()
-    for i = 1,9 do
+    for i = 1, 9 do
         if not self:checkRow(i) then
             return false
         end
     end
 
-    for j = 1,9 do
+    for j = 1, 9 do
         if not self:checkColumn(j) then
             return false
         end
     end
 
-    for i = 1,3 do
-        for j = 1,3 do
+    for i = 1, 3 do
+        for j = 1, 3 do
             if not self:checkBlock(i, j) then
                 return false
             end
