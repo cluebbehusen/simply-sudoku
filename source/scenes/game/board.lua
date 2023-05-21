@@ -10,8 +10,10 @@ Board.size = Cell.size * 9 + 12
 
 writeBoardImage(Board.size, Cell.size)
 
-function Board:init(x, y, puzzlePath)
-    local rawPuzzle = json.decodeFile(puzzlePath)
+function Board:init(x, y, puzzleDifficulty, puzzleNumber)
+    local rawPuzzles = json.decodeFile("puzzles/" .. puzzleDifficulty .. ".json")
+    local rawPuzzle = rawPuzzles[puzzleNumber]["puzzle"]
+    self.solution = rawPuzzles[puzzleNumber]["solution"]
 
     self.selRow = 1
     self.selColumn = 1
@@ -93,66 +95,13 @@ function Board:decrementSelectedCell()
     end
 end
 
-function Board:checkRow(row)
-    local values = {}
-    for j = 1, 9 do
-        local value = self.cells[row][j].value
-        if not value or values[value] then
-            return false
-        end
-        values[value] = true
-    end
-    return true
-end
-
-function Board:checkColumn(column)
-    local values = {}
-    for i = 1, 9 do
-        local value = self.cells[i][column].value
-        if not value or values[value] then
-            return false
-        end
-        values[value] = true
-    end
-    return true
-end
-
-function Board:checkBlock(blockRow, blockColumn)
-    local values = {}
-    local startRow = 3 * blockRow - 2
-    local startColumn = 3 * blockColumn - 2
-    for i = startRow, startRow + 2 do
-        for j = startColumn, startColumn + 2 do
-            local value = self.cells[i][j].value
-            if not value or values[value] then
-                return false
-            end
-            values[value] = true
-        end
-    end
-    return true
-end
-
 function Board:isSolved()
-    for i = 1, 9 do
-        if not self:checkRow(i) then
-            return false
-        end
-    end
-
-    for j = 1, 9 do
-        if not self:checkColumn(j) then
-            return false
-        end
-    end
-
-    for i = 1, 3 do
-        for j = 1, 3 do
-            if not self:checkBlock(i, j) then
+    for row = 1, 9 do
+        for column = 1, 9 do
+            if self.cells[row][column].value ~= self.solution[row][column] then
                 return false
             end
         end
     end
-
     return true
 end

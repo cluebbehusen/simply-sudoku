@@ -28,12 +28,16 @@ function StartMenuItem:draw(selected, x, y, width, height)
     image:draw(x, y)
 end
 
+function StartMenuItem:BButtonDown(menu)
+    menu:popMenuItems()
+end
+
 class("StartScene").extends()
 
 StartScene.menuWidth = 150
 StartScene.menuItemHeight = 33
 StartScene.menuItemPadding = 4
-StartScene.headerY = 50
+StartScene.headerX = 95
 
 function StartScene:enter(sceneManager)
     self.sceneManager = sceneManager
@@ -41,26 +45,59 @@ function StartScene:enter(sceneManager)
     local screenHeight = pd.display.getHeight()
     local screenWidth = pd.display.getWidth()
 
-    local continuePuzzleMenuItem = StartMenuItem("Continue Puzzle")
-    function continuePuzzleMenuItem:AButtonDown()
-        sceneManager:enter("game")
+    Header(StartScene.headerX)
+
+    local difficulties = {
+        "beginner",
+        "intermediate",
+        "expert"
+    }
+
+    local puzzleMenuItems = {}
+    for _, difficulty in ipairs(difficulties) do
+        puzzleMenuItems[difficulty] = {}
     end
 
-    local menuItems = { continuePuzzleMenuItem, StartMenuItem("Select Puzzle"), StartMenuItem("Tutorial") }
+    for i = 1, 20 do
+        for _, difficulty in ipairs(difficulties) do
+            local puzzleMenuItem = StartMenuItem("Puzzle " .. i .. " ⏳")
+            function puzzleMenuItem:AButtonDown()
+                sceneManager:enter("game", difficulty, i)
+            end
 
-    local menuHeight = #menuItems * (StartScene.menuItemHeight + StartScene.menuItemPadding * 2)
+            table.insert(puzzleMenuItems[difficulty], puzzleMenuItem)
+        end
+    end
 
-    local menuX = (screenWidth - StartScene.menuWidth) / 2
-    local menuY = (screenHeight - menuHeight) / 2 + 32
+    local difficultyMenuItems = {}
+    for _, difficulty in ipairs(difficulties) do
+        local difficultyMenuItem = StartMenuItem(difficulty:gsub("^%l", string.upper))
+        function difficultyMenuItem:AButtonDown(menu)
+            menu:pushMenuItems(puzzleMenuItems[difficulty])
+        end
 
-    self.menu = Menu(menuItems, menuX, menuY, StartScene.menuWidth, menuHeight, StartScene.menuItemHeight,
+        table.insert(difficultyMenuItems, difficultyMenuItem)
+    end
+
+    local selectPuzzleMenuItem = StartMenuItem("Select Puzzle")
+    function selectPuzzleMenuItem:AButtonDown(menu)
+        menu:pushMenuItems(difficultyMenuItems)
+    end
+
+    -- local menuItems = { continuePuzzleMenuItem, StartMenuItem("Select Puzzle"), StartMenuItem("Tutorial") }
+    local mainMenuItems = { selectPuzzleMenuItem, StartMenuItem("Tutorial") }
+
+    local menuHeight = screenHeight - 20
+
+    local menuX = (screenWidth - StartScene.menuWidth) - 35
+    local menuY = (screenHeight - menuHeight) / 2
+
+    self.menu = Menu(mainMenuItems, menuX, menuY, StartScene.menuWidth, menuHeight, StartScene.menuItemHeight,
         StartScene.menuItemPadding)
     self.menu:hook({
         "AButtonDown",
         "BButtonDown",
     })
-
-    Header(StartScene.headerY)
 end
 
 function StartScene:leave()
