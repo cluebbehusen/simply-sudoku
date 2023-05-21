@@ -3,23 +3,23 @@ local gfx <const> = pd.graphics
 
 class("Header").extends(gfx.sprite)
 
-function Header:init(y)
+function Header:init(x)
     local previousFont = gfx.getFont()
 
     gfx.setFont(gfx.font.new("fonts/systemBig"))
 
-    local text = "Simply Sudoku"
+    local text = "Simply\nSudoku"
     local textWidth, textHeight = gfx.getTextSize(text)
 
     local image = gfx.image.new(textWidth, textHeight)
 
     gfx.pushContext(image)
-    gfx.drawText(text, 0, 0)
+    gfx.drawTextAligned(text, textWidth / 2, 0, kTextAlignment.center)
     gfx.popContext()
 
     gfx.setFont(previousFont)
 
-    self:moveTo(pd.display.getWidth() / 2, y)
+    self:moveTo(x, pd.display.getHeight() / 2)
     self:setImage(image)
     self:add()
 end

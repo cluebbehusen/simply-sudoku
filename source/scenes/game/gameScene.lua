@@ -5,14 +5,16 @@ import "board"
 
 class("GameScene").extends()
 
-function GameScene:enter()
+function GameScene:enter(sceneManager, previousScene, puzzleDifficulty, puzzleNumber)
+    self.sceneManager = sceneManager
+
     local screenHeight = pd.display.getHeight()
     local screenWidth = pd.display.getWidth()
 
     local boardX = (screenWidth - Board.size) / 2
     local boardY = (screenHeight - Board.size) / 2
 
-    self.board = Board(boardX, boardY, 'puzzles/1.json')
+    self.board = Board(boardX, boardY, puzzleDifficulty, puzzleNumber)
 
     self.keyTimers = {}
 end
