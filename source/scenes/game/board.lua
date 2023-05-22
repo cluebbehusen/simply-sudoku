@@ -11,9 +11,19 @@ Board.size = Cell.size * 9 + 12
 writeBoardImage(Board.size, Cell.size)
 
 function Board:init(x, y, puzzleDifficulty, puzzleNumber)
+    self.puzzleDifficulty = puzzleDifficulty
+    self.puzzleNumber = puzzleNumber
+
     local rawPuzzles = json.decodeFile("puzzles/" .. puzzleDifficulty .. ".json")
     local rawPuzzle = rawPuzzles[puzzleNumber]["puzzle"]
     self.solution = rawPuzzles[puzzleNumber]["solution"]
+
+    local saveData = pd.datastore.read()
+    if not saveData then
+        error("No save data found")
+    end
+
+    local progress = saveData["puzzles"][self.puzzleDifficulty][self.puzzleNumber]["progress"]
 
     self.selRow = 1
     self.selColumn = 1
@@ -23,10 +33,13 @@ function Board:init(x, y, puzzleDifficulty, puzzleNumber)
         self.cells[row] = {}
         for column = 1, 9 do
             local value = rawPuzzle[row][column]
+            local progressValue = progress and progress[row][column] or 0
             local offsetX = x + 2 + (column - 1) * (Cell.size + 1)
             local offsetY = y + 2 + (row - 1) * (Cell.size + 1)
             if value ~= 0 then
                 self.cells[row][column] = Cell(offsetX, offsetY, value, true)
+            elseif progressValue ~= 0 then
+                self.cells[row][column] = Cell(offsetX, offsetY, progressValue, false)
             else
                 self.cells[row][column] = Cell(offsetX, offsetY, nil, false)
             end
@@ -104,4 +117,32 @@ function Board:isSolved()
         end
     end
     return true
+end
+
+function Board:save()
+    local saveData = pd.datastore.read()
+    if not saveData then
+        error("No save data found")
+    end
+
+    saveData["lastPlayed"] = {
+        ["difficulty"] = self.puzzleDifficulty,
+        ["number"] = self.puzzleNumber
+    }
+
+    local puzzleData = saveData["puzzles"][self.puzzleDifficulty][self.puzzleNumber]
+    puzzleData["state"] = "in-progress"
+    puzzleData["progress"] = {}
+    for row = 1, 9 do
+        puzzleData["progress"][row] = {}
+        for column = 1, 9 do
+            local value = self.cells[row][column].value
+            if not value then
+                value = 0
+            end
+
+            puzzleData["progress"][row][column] = self.cells[row][column].value
+        end
+    end
+    pd.datastore.write(saveData)
 end

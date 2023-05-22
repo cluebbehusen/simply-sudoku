@@ -93,3 +93,11 @@ end
 function GameScene:rightButtonUp()
     self:removeTimer("rightButton")
 end
+
+function GameScene:gameWillTerminate()
+    self.board:save()
+end
+
+function GameScene:deviceWillSleep()
+    self.board:save()
+end

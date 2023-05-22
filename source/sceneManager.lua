@@ -31,3 +31,11 @@ function SceneManager:hook(handlersToInclude)
     end
     pd.inputHandlers.push(handlers, false)
 end
+
+function SceneManager:gameWillTerminate()
+    self:emit("gameWillTerminate")
+end
+
+function SceneManager:deviceWillSleep()
+    self:emit("deviceWillSleep")
+end
