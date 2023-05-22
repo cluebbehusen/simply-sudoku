@@ -104,8 +104,6 @@ function StartScene:enter(sceneManager)
         table.insert(mainMenuItems, 1, continuePuzzleMenuItem)
     end
 
-    -- local menuItems = { continuePuzzleMenuItem, StartMenuItem("Select Puzzle"), StartMenuItem("Tutorial") }
-
     local menuHeight = screenHeight - 20
 
     local menuX = (screenWidth - StartScene.menuWidth) - 35
