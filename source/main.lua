@@ -10,10 +10,14 @@ local gfx <const> = playdate.graphics
 
 gfx.setFont(gfx.font.new("fonts/system"))
 
+import "util/globals"
+import "util/saveData"
 import "menu"
 import "sceneManager"
 import "scenes/game/gameScene"
 import "scenes/start/startScene"
+
+maybeInstantiateSaveData()
 
 local scenes = {
     game = GameScene(),
@@ -36,7 +40,15 @@ sceneManager:hook({
     "rightButtonUp",
 })
 
-function playdate.update()
+function pd.gameWillTerminate()
+    sceneManager:gameWillTerminate()
+end
+
+function pd.deviceWillSleep()
+    sceneManager:deviceWillSleep()
+end
+
+function pd.update()
     pd.timer.updateTimers()
     gfx.sprite.update()
 

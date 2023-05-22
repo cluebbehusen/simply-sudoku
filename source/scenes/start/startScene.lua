@@ -42,25 +42,32 @@ StartScene.headerX = 95
 function StartScene:enter(sceneManager)
     self.sceneManager = sceneManager
 
+    local saveData = pd.datastore.read()
+    if not saveData then
+        error("No save data found")
+    end
+
     local screenHeight = pd.display.getHeight()
     local screenWidth = pd.display.getWidth()
 
     Header(StartScene.headerX)
 
-    local difficulties = {
-        "beginner",
-        "intermediate",
-        "expert"
-    }
-
     local puzzleMenuItems = {}
-    for _, difficulty in ipairs(difficulties) do
+    for _, difficulty in ipairs(DIFFICULTIES) do
         puzzleMenuItems[difficulty] = {}
     end
 
-    for i = 1, 20 do
-        for _, difficulty in ipairs(difficulties) do
-            local puzzleMenuItem = StartMenuItem("Puzzle " .. i .. " ⏳")
+    for i = 1, NUM_PUZZLES do
+        for _, difficulty in ipairs(DIFFICULTIES) do
+            local puzzleState = saveData["puzzles"][difficulty][i]["state"]
+            local additionalIcon = ""
+            if puzzleState == "in-progress" then
+                additionalIcon = " ⏳"
+            elseif puzzleState == "completed" then
+                additionalIcon = " ⎷"
+            end
+
+            local puzzleMenuItem = StartMenuItem("Puzzle " .. i .. additionalIcon)
             function puzzleMenuItem:AButtonDown()
                 sceneManager:enter("game", difficulty, i)
             end
@@ -70,7 +77,7 @@ function StartScene:enter(sceneManager)
     end
 
     local difficultyMenuItems = {}
-    for _, difficulty in ipairs(difficulties) do
+    for _, difficulty in ipairs(DIFFICULTIES) do
         local difficultyMenuItem = StartMenuItem(difficulty:gsub("^%l", string.upper))
         function difficultyMenuItem:AButtonDown(menu)
             menu:pushMenuItems(puzzleMenuItems[difficulty])
@@ -84,8 +91,20 @@ function StartScene:enter(sceneManager)
         menu:pushMenuItems(difficultyMenuItems)
     end
 
-    -- local menuItems = { continuePuzzleMenuItem, StartMenuItem("Select Puzzle"), StartMenuItem("Tutorial") }
     local mainMenuItems = { selectPuzzleMenuItem, StartMenuItem("Tutorial") }
+
+    if saveData["lastPlayed"] then
+        local continuePuzzleMenuItem = StartMenuItem("Continue Puzzle")
+        function continuePuzzleMenuItem:AButtonDown()
+            local difficulty = saveData["lastPlayed"]["difficulty"]
+            local number = saveData["lastPlayed"]["number"]
+            sceneManager:enter("game", difficulty, number)
+        end
+
+        table.insert(mainMenuItems, 1, continuePuzzleMenuItem)
+    end
+
+    -- local menuItems = { continuePuzzleMenuItem, StartMenuItem("Select Puzzle"), StartMenuItem("Tutorial") }
 
     local menuHeight = screenHeight - 20
 
