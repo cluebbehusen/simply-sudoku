@@ -9,6 +9,13 @@ end
 
 class("Menu").extends(gfx.sprite)
 
+Menu.reservedHandlers = {
+    "upButtonDown",
+    "upButtonUp",
+    "downButtonDown",
+    "downButtonUp",
+}
+
 function Menu:init(initialMenuItems, x, y, width, height, cellHeight, cellPadding)
     self.gridviewWidth = width
     self.gridviewHeight = height
@@ -27,6 +34,8 @@ function Menu:init(initialMenuItems, x, y, width, height, cellHeight, cellPaddin
 
         menuItem:draw(selected, x, y, width, height)
     end
+
+    self.keyTimers = {}
 
     self:setCenter(0, 0)
     self:moveTo(x, y)
@@ -55,18 +64,42 @@ function Menu:popMenuItems()
     self.gridview:setSelectedRow(1)
 end
 
+function Menu:removeTimer(name)
+    if self.keyTimers[name] then
+        self.keyTimers[name]:remove()
+        self.keyTimers[name] = nil
+    end
+end
+
+function Menu:addTimer(name, callback)
+    if self.keyTimers[name] then
+        self:removeTimer()
+    end
+    self.keyTimers[name] = pd.timer.keyRepeatTimer(callback)
+end
+
 function Menu:upButtonDown()
-    self.gridview:selectPreviousRow(true)
+    self:addTimer("upButton", function() self.gridview:selectPreviousRow(true) end)
+end
+
+function Menu:upButtonUp()
+    self:removeTimer("upButton")
 end
 
 function Menu:downButtonDown()
-    self.gridview:selectNextRow(true)
+    self:addTimer("downButton", function() self.gridview:selectNextRow(true) end)
+end
+
+function Menu:downButtonUp()
+    self:removeTimer("downButton")
 end
 
 function Menu:hook(handlersToInclude)
     for _, handler in ipairs(handlersToInclude) do
-        if handler == "upButtonDown" or hander == "downButtonDown" then
-            error("upButtonDown and downButtonDown are reserved for Menu.")
+        for _, reservedHandler in ipairs(self.reservedHandlers) do
+            if handler == reservedHandler then
+                error(handler .. " is reserved for Menu.")
+            end
         end
         self[handler] = function(...) self:emit(handler, ...) end
     end
