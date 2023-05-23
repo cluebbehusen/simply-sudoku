@@ -8,6 +8,12 @@ class("GameScene").extends()
 function GameScene:enter(sceneManager, previousScene, puzzleDifficulty, puzzleNumber)
     self.sceneManager = sceneManager
 
+    local menu = pd.getSystemMenu()
+
+    menu:addMenuItem("main menu", function()
+        sceneManager:enter("start")
+    end)
+
     local screenHeight = pd.display.getHeight()
     local screenWidth = pd.display.getWidth()
 
@@ -20,6 +26,10 @@ function GameScene:enter(sceneManager, previousScene, puzzleDifficulty, puzzleNu
 end
 
 function GameScene:leave()
+    self.board:save()
+
+    local menu = pd.getSystemMenu()
+    menu:removeAllMenuItems()
     gfx.sprite.removeAll()
     local allTimers = pd.timer.allTimers()
 
