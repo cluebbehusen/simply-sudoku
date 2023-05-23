@@ -125,8 +125,16 @@ function StartScene:upButtonDown()
     self.menu:upButtonDown()
 end
 
+function StartScene:upButtonUp()
+    self.menu:upButtonUp()
+end
+
 function StartScene:downButtonDown()
     self.menu:downButtonDown()
+end
+
+function StartScene:downButtonUp()
+    self.menu:downButtonUp()
 end
 
 function StartScene:AButtonDown()
