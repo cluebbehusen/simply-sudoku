@@ -15,7 +15,8 @@ local function instantiateSaveData()
             saveData["puzzles"][difficulty][i] = {
                 time = nil,
                 state = "not-started",
-                progress = nil
+                progress = nil,
+                annotations = {}
             }
         end
     end

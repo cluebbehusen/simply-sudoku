@@ -23,7 +23,10 @@ function Board:init(x, y, puzzleDifficulty, puzzleNumber)
         error("No save data found")
     end
 
-    local progress = saveData["puzzles"][self.puzzleDifficulty][self.puzzleNumber]["progress"]
+    local puzzleSaveData = saveData["puzzles"][self.puzzleDifficulty][self.puzzleNumber]
+
+    local progress = puzzleSaveData["progress"]
+    local puzzleAnnotations = puzzleSaveData["annotations"]
 
     self.selRow = 1
     self.selColumn = 1
@@ -32,16 +35,19 @@ function Board:init(x, y, puzzleDifficulty, puzzleNumber)
     for row = 1, 9 do
         self.cells[row] = {}
         for column = 1, 9 do
-            local value = rawPuzzle[row][column]
-            local progressValue = progress and progress[row][column] or 0
+            local specifiedValue = rawPuzzle[row][column]
+            local progressValue = progress and progress[row][column] or nil
+            if progressValue == 0 then
+                progressValue = nil
+            end
+            local annotations = puzzleAnnotations[row .. '-' .. column]
+
             local offsetX = x + 2 + (column - 1) * (Cell.size + 1)
             local offsetY = y + 2 + (row - 1) * (Cell.size + 1)
-            if value ~= 0 then
-                self.cells[row][column] = Cell(offsetX, offsetY, value, true)
-            elseif progressValue ~= 0 then
-                self.cells[row][column] = Cell(offsetX, offsetY, progressValue, false)
+            if specifiedValue ~= 0 then
+                self.cells[row][column] = Cell(offsetX, offsetY, specifiedValue, true)
             else
-                self.cells[row][column] = Cell(offsetX, offsetY, nil, false)
+                self.cells[row][column] = Cell(offsetX, offsetY, progressValue, false, annotations)
             end
         end
     end
@@ -52,6 +58,57 @@ function Board:init(x, y, puzzleDifficulty, puzzleNumber)
     self:setImage(pd.datastore.readImage("board"))
     self:moveTo(x, y)
     self:add()
+end
+
+function Board:BButtonDown()
+    if self.cells[self.selRow][self.selColumn].value then
+        return
+    end
+    if self.cells[self.selRow][self.selColumn]:isAnnotating() then
+        self.cells[self.selRow][self.selColumn]:unsetAnnotating()
+    else
+        self.cells[self.selRow][self.selColumn]:setAnnotating()
+    end
+end
+
+function Board:AButtonDown()
+    if self.cells[self.selRow][self.selColumn]:isAnnotating() then
+        self.cells[self.selRow][self.selColumn]:flipSelectedAnnotation()
+    else
+        self:incrementSelectedCell()
+    end
+end
+
+function Board:upButtonDown()
+    if self.cells[self.selRow][self.selColumn]:isAnnotating() then
+        self.cells[self.selRow][self.selColumn]:selectPrevAnnotationRow()
+    else
+        self:selectPrevRow()
+    end
+end
+
+function Board:downButtonDown()
+    if self.cells[self.selRow][self.selColumn]:isAnnotating() then
+        self.cells[self.selRow][self.selColumn]:selectNextAnnotationRow()
+    else
+        self:selectNextRow()
+    end
+end
+
+function Board:rightButtonDown()
+    if self.cells[self.selRow][self.selColumn]:isAnnotating() then
+        self.cells[self.selRow][self.selColumn]:selectNextAnnotationColumn()
+    else
+        self:selectNextColumn()
+    end
+end
+
+function Board:leftButtonDown()
+    if self.cells[self.selRow][self.selColumn]:isAnnotating() then
+        self.cells[self.selRow][self.selColumn]:selectPrevAnnotationColumn()
+    else
+        self:selectPrevColumn()
+    end
 end
 
 function Board:selectNextRow()
@@ -101,13 +158,6 @@ function Board:incrementSelectedCell()
     end
 end
 
-function Board:decrementSelectedCell()
-    local valueChanged = self.cells[self.selRow][self.selColumn]:decrementValue()
-    if valueChanged then
-        print(self:isSolved())
-    end
-end
-
 function Board:isSolved()
     for row = 1, 9 do
         for column = 1, 9 do
@@ -133,15 +183,23 @@ function Board:save()
     local puzzleData = saveData["puzzles"][self.puzzleDifficulty][self.puzzleNumber]
     puzzleData["state"] = "in-progress"
     puzzleData["progress"] = {}
+    puzzleData["annotations"] = {}
     for row = 1, 9 do
         puzzleData["progress"][row] = {}
         for column = 1, 9 do
-            local value = self.cells[row][column].value
+            local currentCell = self.cells[row][column]
+
+            local value = currentCell.value
             if not value then
                 value = 0
             end
 
-            puzzleData["progress"][row][column] = self.cells[row][column].value
+            puzzleData["progress"][row][column] = value
+
+            if not currentCell.specified and not currentCell.value then
+                local cellAnnotationKey = row .. '-' .. column
+                puzzleData["annotations"][cellAnnotationKey] = currentCell.annotations
+            end
         end
     end
     pd.datastore.write(saveData)

@@ -57,7 +57,7 @@ function GameScene:addTimer(name, callback)
 end
 
 function GameScene:AButtonDown()
-    self:addTimer("AButton", function() self.board:incrementSelectedCell() end)
+    self:addTimer("AButton", function() self.board:AButtonDown() end)
 end
 
 function GameScene:AButtonUp()
@@ -65,15 +65,11 @@ function GameScene:AButtonUp()
 end
 
 function GameScene:BButtonDown()
-    self:addTimer("BButton", function() self.board:decrementSelectedCell() end)
-end
-
-function GameScene:BButtonUp()
-    self:removeTimer("BButton")
+    self.board:BButtonDown()
 end
 
 function GameScene:upButtonDown()
-    self:addTimer("upButton", function() self.board:selectPrevRow() end)
+    self:addTimer("upButton", function() self.board:upButtonDown() end)
 end
 
 function GameScene:upButtonUp()
@@ -81,7 +77,7 @@ function GameScene:upButtonUp()
 end
 
 function GameScene:downButtonDown()
-    self:addTimer("downButton", function() self.board:selectNextRow() end)
+    self:addTimer("downButton", function() self.board:downButtonDown() end)
 end
 
 function GameScene:downButtonUp()
@@ -89,7 +85,7 @@ function GameScene:downButtonUp()
 end
 
 function GameScene:leftButtonDown()
-    self:addTimer("leftButton", function() self.board:selectPrevColumn() end)
+    self:addTimer("leftButton", function() self.board:leftButtonDown() end)
 end
 
 function GameScene:leftButtonUp()
@@ -97,7 +93,7 @@ function GameScene:leftButtonUp()
 end
 
 function GameScene:rightButtonDown()
-    self:addTimer("rightButton", function() self.board:selectNextColumn() end)
+    self:addTimer("rightButton", function() self.board:rightButtonDown() end)
 end
 
 function GameScene:rightButtonUp()
