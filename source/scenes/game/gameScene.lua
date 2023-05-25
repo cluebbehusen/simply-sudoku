@@ -8,12 +8,6 @@ class("GameScene").extends()
 function GameScene:enter(sceneManager, previousScene, puzzleDifficulty, puzzleNumber)
     self.sceneManager = sceneManager
 
-    local menu = pd.getSystemMenu()
-
-    menu:addMenuItem("main menu", function()
-        sceneManager:enter("start")
-    end)
-
     local screenHeight = pd.display.getHeight()
     local screenWidth = pd.display.getWidth()
 
@@ -21,6 +15,15 @@ function GameScene:enter(sceneManager, previousScene, puzzleDifficulty, puzzleNu
     local boardY = (screenHeight - Board.size) / 2
 
     self.board = Board(boardX, boardY, puzzleDifficulty, puzzleNumber)
+
+    local menu = pd.getSystemMenu()
+
+    menu:addMenuItem("main menu", function()
+        sceneManager:enter("start")
+    end)
+    menu:addMenuItem("annotate", function()
+        self.board:autoAnnotate()
+    end)
 
     self.keyTimers = {}
 end

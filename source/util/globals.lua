@@ -1,7 +1,8 @@
 DIFFICULTIES = {
-    "beginner",
-    "intermediate",
+    "easy",
+    "medium",
+    "hard",
     "expert"
 }
 
-NUM_PUZZLES = 20
+NUM_PUZZLES = 30
