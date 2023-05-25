@@ -169,6 +169,69 @@ function Board:isSolved()
     return true
 end
 
+function Board:isValueInRow(value, row)
+    for column = 1, 9 do
+        if self.cells[row][column].value == value then
+            return true
+        end
+    end
+    return false
+end
+
+function Board:isValueInColumn(value, column)
+    for row = 1, 9 do
+        if self.cells[row][column].value == value then
+            return true
+        end
+    end
+    return false
+end
+
+function Board:isValueInBox(value, row, column)
+    local boxRow = math.floor((row - 1) / 3) * 3 + 1
+    local boxColumn = math.floor((column - 1) / 3) * 3 + 1
+    for i = boxRow, boxRow + 2 do
+        for j = boxColumn, boxColumn + 2 do
+            if self.cells[i][j].value == value then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+function Board:annotateCell(row, column)
+    local cell = self.cells[row][column]
+    if cell.value then
+        return
+    end
+
+    local annotations = {}
+    for i = 1, 9 do
+        annotations[i] = true
+    end
+
+    for i = 1, 9 do
+        if self:isValueInRow(i, row) then
+            annotations[i] = nil
+        elseif self:isValueInColumn(i, column) then
+            annotations[i] = nil
+        elseif self:isValueInBox(i, row, column) then
+            annotations[i] = nil
+        end
+    end
+
+    cell:setAnnotations(annotations)
+end
+
+function Board:autoAnnotate()
+    for row = 1, 9 do
+        for column = 1, 9 do
+            self:annotateCell(row, column)
+        end
+    end
+end
+
 function Board:save()
     local saveData = pd.datastore.read()
     if not saveData then

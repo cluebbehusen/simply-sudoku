@@ -71,6 +71,11 @@ function Cell:hasAnnotations()
     return false
 end
 
+function Cell:setAnnotations(annotations)
+    self.annotations = annotations
+    self:updateImage()
+end
+
 function Cell:incrementValue()
     if self.specified then
         return false
@@ -163,7 +168,6 @@ function Cell:updateImage()
     local imageKey = getImageKey(self.specified, self.value)
     local image = Cell.images[imageKey]
 
-    
     if self.annotations then
         image = image:copy()
         gfx.pushContext(image)
