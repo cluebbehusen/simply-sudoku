@@ -15,6 +15,6 @@ function CompleteScene:leave()
     gfx.sprite.removeAll()
 end
 
-function CompleteScene:AButtonDown()
+function CompleteScene:AButtonUp()
     self.sceneManager:enter("start")
 end

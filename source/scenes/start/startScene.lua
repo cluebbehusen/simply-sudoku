@@ -33,7 +33,7 @@ function StartMenuItem:draw(selected, x, y, width, height)
     image:draw(x, y)
 end
 
-function StartMenuItem:BButtonDown(menu)
+function StartMenuItem:BButtonUp(menu)
     menu:popMenuItems()
 end
 
@@ -87,7 +87,7 @@ function StartScene:enter(sceneManager)
                 sceneManager:enter("game", difficulty, i)
             end
 
-            function puzzleMenuItem:BButtonDown(menu)
+            function puzzleMenuItem:BButtonUp(menu)
                 helperText:remove()
                 menu:popMenuItems()
             end
@@ -143,7 +143,7 @@ function StartScene:enter(sceneManager)
     self.menu:hook({
         "AButtonHeld",
         "AButtonUp",
-        "BButtonDown",
+        "BButtonUp",
     })
 end
 
@@ -180,8 +180,8 @@ function StartScene:AButtonUp()
     self.menu:AButtonUp()
 end
 
-function StartScene:BButtonDown()
-    self.menu:BButtonDown()
+function StartScene:BButtonUp()
+    self.menu:BButtonUp()
 end
 
 function StartScene:AButtonHeld()
