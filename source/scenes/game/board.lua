@@ -250,6 +250,8 @@ function Board:save(completed)
             ["difficulty"] = self.puzzleDifficulty,
             ["number"] = self.puzzleNumber
         }
+    else
+        saveData["lastPlayed"] = nil
     end
 
     local puzzleData = saveData["puzzles"][self.puzzleDifficulty][self.puzzleNumber]
