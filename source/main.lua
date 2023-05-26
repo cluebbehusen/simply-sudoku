@@ -16,18 +16,21 @@ import "menu"
 import "sceneManager"
 import "scenes/game/gameScene"
 import "scenes/start/startScene"
+import "scenes/complete/completeScene"
 
 maybeInstantiateSaveData()
 
 local scenes = {
     game = GameScene(),
-    start = StartScene()
+    start = StartScene(),
+    complete = CompleteScene()
 }
 
 local sceneManager = SceneManager(scenes, "start")
 sceneManager:hook({
     "AButtonDown",
     "AButtonUp",
+    "AButtonHeld",
     "BButtonDown",
     "BButtonUp",
     "upButtonDown",

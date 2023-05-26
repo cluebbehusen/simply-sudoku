@@ -32,3 +32,19 @@ function maybeInstantiateSaveData()
         instantiateSaveData()
     end
 end
+
+function resetPuzzle(difficulty, number)
+    local saveData = pd.datastore.read()
+    if not saveData then
+        error("No save data found")
+    end
+
+    local puzzle = saveData["puzzles"][difficulty][number]
+
+    puzzle["state"] = "not-started"
+    puzzle["time"] = nil
+    puzzle["progress"] = nil
+    puzzle["annotations"] = {}
+
+    pd.datastore.write(saveData)
+end

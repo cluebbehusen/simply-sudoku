@@ -14,7 +14,7 @@ function GameScene:enter(sceneManager, previousScene, puzzleDifficulty, puzzleNu
     local boardX = (screenWidth - Board.size) / 2
     local boardY = (screenHeight - Board.size) / 2
 
-    self.board = Board(boardX, boardY, puzzleDifficulty, puzzleNumber)
+    self.board = Board(boardX, boardY, puzzleDifficulty, puzzleNumber, sceneManager)
 
     local menu = pd.getSystemMenu()
 
@@ -28,14 +28,14 @@ function GameScene:enter(sceneManager, previousScene, puzzleDifficulty, puzzleNu
     self.keyTimers = {}
 end
 
-function GameScene:leave()
-    self.board:save()
+function GameScene:leave(sceneManager, nextScene, puzzleCompleted)
+    self.board:save(puzzleCompleted)
 
     local menu = pd.getSystemMenu()
     menu:removeAllMenuItems()
     gfx.sprite.removeAll()
-    local allTimers = pd.timer.allTimers()
 
+    local allTimers = pd.timer.allTimers()
     if not allTimers then
         return
     end

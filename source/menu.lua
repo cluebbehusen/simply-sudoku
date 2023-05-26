@@ -114,24 +114,32 @@ function Menu:emit(event, ...)
     end
 end
 
+function Menu:draw()
+    local actualHeight = #self.stack[#self.stack] * (self.cellHeight + self.cellPadding * 2)
+
+    local adjustedHeight = actualHeight
+    local adjustedY = (self.gridviewHeight - actualHeight) / 2
+
+    if actualHeight > self.gridviewHeight then
+        adjustedHeight = self.gridviewHeight
+        adjustedY = 0
+    end
+
+    local menuImage = gfx.image.new(self.gridviewWidth, self.gridviewHeight)
+
+    gfx.pushContext(menuImage)
+    self.gridview:drawInRect(0, adjustedY, self.gridviewWidth, adjustedHeight)
+    gfx.popContext()
+
+    self:setImage(menuImage)
+end
+
+function Menu:forceUpdate()
+    self:draw()
+end
+
 function Menu:update()
     if self.gridview.needsDisplay then
-        local actualHeight = #self.stack[#self.stack] * (self.cellHeight + self.cellPadding * 2)
-
-        local adjustedHeight = actualHeight
-        local adjustedY = (self.gridviewHeight - actualHeight) / 2
-
-        if actualHeight > self.gridviewHeight then
-            adjustedHeight = self.gridviewHeight
-            adjustedY = 0
-        end
-
-        local menuImage = gfx.image.new(self.gridviewWidth, self.gridviewHeight)
-
-        gfx.pushContext(menuImage)
-        self.gridview:drawInRect(0, adjustedY, self.gridviewWidth, adjustedHeight)
-        gfx.popContext()
-
-        self:setImage(menuImage)
+        self:draw()
     end
 end
