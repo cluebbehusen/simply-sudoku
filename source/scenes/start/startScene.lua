@@ -59,6 +59,8 @@ function StartScene:enter(sceneManager)
 
     Header(StartScene.headerX)
 
+    local mainMenuItems = {}
+
     local puzzleMenuItems = {}
     for _, difficulty in ipairs(DIFFICULTIES) do
         puzzleMenuItems[difficulty] = {}
@@ -93,6 +95,10 @@ function StartScene:enter(sceneManager)
             end
 
             function puzzleMenuItem:AButtonHeld(menu)
+                local isLastPlayed = isLastPlayed(difficulty, i)
+                if isLastPlayed then
+                    table.remove(mainMenuItems, 1)
+                end
                 resetPuzzle(difficulty, i)
                 self:setText("Puzzle " .. i)
                 self.puzzleState = "not-started"
@@ -120,7 +126,8 @@ function StartScene:enter(sceneManager)
         menu:pushMenuItems(difficultyMenuItems)
     end
 
-    local mainMenuItems = { selectPuzzleMenuItem, StartMenuItem("Tutorial") }
+    table.insert(mainMenuItems, selectPuzzleMenuItem)
+    table.insert(mainMenuItems, StartMenuItem("Tutorial"))
 
     if saveData["lastPlayed"] then
         local continuePuzzleMenuItem = StartMenuItem("Continue Puzzle")

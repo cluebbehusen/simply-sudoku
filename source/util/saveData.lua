@@ -33,6 +33,20 @@ function maybeInstantiateSaveData()
     end
 end
 
+function isLastPlayed(difficulty, number)
+    local saveData = pd.datastore.read()
+    if not saveData then
+        error("No save data found")
+    end
+
+    local lastPlayed = saveData["lastPlayed"]
+    if not lastPlayed then
+        return false
+    end
+
+    return lastPlayed["difficulty"] == difficulty and lastPlayed["number"] == number
+end
+
 function resetPuzzle(difficulty, number)
     local saveData = pd.datastore.read()
     if not saveData then
@@ -45,6 +59,11 @@ function resetPuzzle(difficulty, number)
     puzzle["time"] = nil
     puzzle["progress"] = nil
     puzzle["annotations"] = {}
+
+    local lastPlayed = saveData["lastPlayed"]
+    if lastPlayed and lastPlayed["difficulty"] == difficulty and lastPlayed["number"] == number then
+        saveData["lastPlayed"] = nil
+    end
 
     pd.datastore.write(saveData)
 end

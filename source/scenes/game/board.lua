@@ -245,10 +245,12 @@ function Board:save(completed)
         error("No save data found")
     end
 
-    saveData["lastPlayed"] = {
-        ["difficulty"] = self.puzzleDifficulty,
-        ["number"] = self.puzzleNumber
-    }
+    if not completed then
+        saveData["lastPlayed"] = {
+            ["difficulty"] = self.puzzleDifficulty,
+            ["number"] = self.puzzleNumber
+        }
+    end
 
     local puzzleData = saveData["puzzles"][self.puzzleDifficulty][self.puzzleNumber]
     puzzleData["state"] = completed and "completed" or "in-progress"
