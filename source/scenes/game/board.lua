@@ -10,9 +10,10 @@ Board.size = Cell.size * 9 + 12
 
 writeBoardImage(Board.size, Cell.size)
 
-function Board:init(x, y, puzzleDifficulty, puzzleNumber)
+function Board:init(x, y, puzzleDifficulty, puzzleNumber, sceneManager)
     self.puzzleDifficulty = puzzleDifficulty
     self.puzzleNumber = puzzleNumber
+    self.sceneManager = sceneManager
 
     local rawPuzzles = json.decodeFile("puzzles/" .. puzzleDifficulty .. ".json")
     local rawPuzzle = rawPuzzles[puzzleNumber]["puzzle"]
@@ -154,7 +155,7 @@ end
 function Board:incrementSelectedCell()
     local valueChanged = self.cells[self.selRow][self.selColumn]:incrementValue()
     if valueChanged then
-        print(self:isSolved())
+        self:checkSolved()
     end
 end
 
@@ -167,6 +168,12 @@ function Board:isSolved()
         end
     end
     return true
+end
+
+function Board:checkSolved()
+    if self:isSolved() then
+        self.sceneManager:enter("complete")
+    end
 end
 
 function Board:isValueInRow(value, row)
@@ -232,7 +239,7 @@ function Board:autoAnnotate()
     end
 end
 
-function Board:save()
+function Board:save(completed)
     local saveData = pd.datastore.read()
     if not saveData then
         error("No save data found")
@@ -244,7 +251,7 @@ function Board:save()
     }
 
     local puzzleData = saveData["puzzles"][self.puzzleDifficulty][self.puzzleNumber]
-    puzzleData["state"] = "in-progress"
+    puzzleData["state"] = completed and "completed" or "in-progress"
     puzzleData["progress"] = {}
     puzzleData["annotations"] = {}
     for row = 1, 9 do

@@ -2,10 +2,15 @@ local pd <const> = playdate
 local gfx <const> = pd.graphics
 
 import "header"
+import "helperText"
 
 class("StartMenuItem").extends(MenuItem)
 
 function StartMenuItem:init(text)
+    self.text = text
+end
+
+function StartMenuItem:setText(text)
     self.text = text
 end
 
@@ -28,7 +33,7 @@ function StartMenuItem:draw(selected, x, y, width, height)
     image:draw(x, y)
 end
 
-function StartMenuItem:BButtonDown(menu)
+function StartMenuItem:BButtonUp(menu)
     menu:popMenuItems()
 end
 
@@ -41,6 +46,8 @@ StartScene.headerX = 95
 
 function StartScene:enter(sceneManager)
     self.sceneManager = sceneManager
+
+    local helperText = HelperText()
 
     local saveData = pd.datastore.read()
     if not saveData then
@@ -68,8 +75,29 @@ function StartScene:enter(sceneManager)
             end
 
             local puzzleMenuItem = StartMenuItem("Puzzle " .. i .. additionalIcon)
-            function puzzleMenuItem:AButtonDown()
+            puzzleMenuItem.state = puzzleState
+            function puzzleMenuItem:AButtonUp()
+                if self.state == "completed" then
+                    return
+                end
+                if self.ignoreNext then
+                    self.ignoreNext = nil
+                    return
+                end
                 sceneManager:enter("game", difficulty, i)
+            end
+
+            function puzzleMenuItem:BButtonUp(menu)
+                helperText:remove()
+                menu:popMenuItems()
+            end
+
+            function puzzleMenuItem:AButtonHeld(menu)
+                resetPuzzle(difficulty, i)
+                self:setText("Puzzle " .. i)
+                self.puzzleState = "not-started"
+                self.ignoreNext = true
+                menu:forceUpdate()
             end
 
             table.insert(puzzleMenuItems[difficulty], puzzleMenuItem)
@@ -79,7 +107,8 @@ function StartScene:enter(sceneManager)
     local difficultyMenuItems = {}
     for _, difficulty in ipairs(DIFFICULTIES) do
         local difficultyMenuItem = StartMenuItem(difficulty:gsub("^%l", string.upper))
-        function difficultyMenuItem:AButtonDown(menu)
+        function difficultyMenuItem:AButtonUp(menu)
+            helperText:add()
             menu:pushMenuItems(puzzleMenuItems[difficulty])
         end
 
@@ -87,7 +116,7 @@ function StartScene:enter(sceneManager)
     end
 
     local selectPuzzleMenuItem = StartMenuItem("Select Puzzle")
-    function selectPuzzleMenuItem:AButtonDown(menu)
+    function selectPuzzleMenuItem:AButtonUp(menu)
         menu:pushMenuItems(difficultyMenuItems)
     end
 
@@ -95,7 +124,7 @@ function StartScene:enter(sceneManager)
 
     if saveData["lastPlayed"] then
         local continuePuzzleMenuItem = StartMenuItem("Continue Puzzle")
-        function continuePuzzleMenuItem:AButtonDown()
+        function continuePuzzleMenuItem:AButtonUp()
             local difficulty = saveData["lastPlayed"]["difficulty"]
             local number = saveData["lastPlayed"]["number"]
             sceneManager:enter("game", difficulty, number)
@@ -112,13 +141,23 @@ function StartScene:enter(sceneManager)
     self.menu = Menu(mainMenuItems, menuX, menuY, StartScene.menuWidth, menuHeight, StartScene.menuItemHeight,
         StartScene.menuItemPadding)
     self.menu:hook({
-        "AButtonDown",
-        "BButtonDown",
+        "AButtonHeld",
+        "AButtonUp",
+        "BButtonUp",
     })
 end
 
 function StartScene:leave()
     gfx.sprite.removeAll()
+
+    local allTimers = pd.timer.allTimers()
+    if not allTimers then
+        return
+    end
+
+    for _, timer in ipairs(allTimers) do
+        timer:remove()
+    end
 end
 
 function StartScene:upButtonDown()
@@ -137,10 +176,14 @@ function StartScene:downButtonUp()
     self.menu:downButtonUp()
 end
 
-function StartScene:AButtonDown()
-    self.menu:AButtonDown()
+function StartScene:AButtonUp()
+    self.menu:AButtonUp()
 end
 
-function StartScene:BButtonDown()
-    self.menu:BButtonDown()
+function StartScene:BButtonUp()
+    self.menu:BButtonUp()
+end
+
+function StartScene:AButtonHeld()
+    self.menu:AButtonHeld()
 end
