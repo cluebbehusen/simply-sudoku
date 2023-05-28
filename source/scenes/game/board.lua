@@ -80,6 +80,13 @@ function Board:AButtonDown()
     end
 end
 
+function Board:AButtonUp()
+    if self.cells[self.selRow][self.selColumn]:isAnnotating() then
+        return
+    end
+    self:checkSolved()
+end
+
 function Board:upButtonDown()
     if self.cells[self.selRow][self.selColumn]:isAnnotating() then
         self.cells[self.selRow][self.selColumn]:selectPrevAnnotationRow()
@@ -153,10 +160,7 @@ function Board:selectPrevColumn()
 end
 
 function Board:incrementSelectedCell()
-    local valueChanged = self.cells[self.selRow][self.selColumn]:incrementValue()
-    if valueChanged then
-        self:checkSolved()
-    end
+    self.cells[self.selRow][self.selColumn]:incrementValue()
 end
 
 function Board:isSolved()
@@ -172,7 +176,9 @@ end
 
 function Board:checkSolved()
     if self:isSolved() then
-        self.sceneManager:enter("complete")
+        pd.timer.performAfterDelay(500, function ()
+            self.sceneManager:enter("complete", true)
+        end)
     end
 end
 

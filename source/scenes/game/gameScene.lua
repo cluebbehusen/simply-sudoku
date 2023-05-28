@@ -65,6 +65,7 @@ end
 
 function GameScene:AButtonUp()
     self:removeTimer("AButton")
+    self.board:AButtonUp()
 end
 
 function GameScene:BButtonDown()
