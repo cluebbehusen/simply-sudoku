@@ -101,7 +101,7 @@ function StartScene:enter(sceneManager)
                 end
                 resetPuzzle(difficulty, i)
                 self:setText("Puzzle " .. i)
-                self.puzzleState = "not-started"
+                self.state = "not-started"
                 self.ignoreNext = true
                 menu:forceUpdate()
             end
