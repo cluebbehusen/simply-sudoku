@@ -16,11 +16,13 @@ Menu.reservedHandlers = {
     "downButtonUp",
 }
 
-function Menu:init(initialMenuItems, x, y, width, height, cellHeight, cellPadding)
+function Menu:init(initialMenuItems, menuOwner, x, y, width, height, cellHeight, cellPadding)
     self.gridviewWidth = width
     self.gridviewHeight = height
     self.cellHeight = cellHeight
     self.cellPadding = cellPadding
+
+    self.menuOwner = menuOwner
 
     self.gridview = pd.ui.gridview.new(0, cellHeight)
     self.gridview:setCellPadding(0, 0, cellPadding, cellPadding)
@@ -111,6 +113,10 @@ function Menu:emit(event, ...)
 
     if selectedMenuItem[event] then
         selectedMenuItem[event](selectedMenuItem, self, ...)
+    end
+    local menuItemEvent = "MenuItem" .. event
+    if self.menuOwner[menuItemEvent] then
+        self.menuOwner[menuItemEvent](self.menuOwner, selectedMenuItem, self, ...)
     end
 end
 
