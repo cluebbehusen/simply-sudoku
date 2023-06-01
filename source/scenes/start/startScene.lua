@@ -17,65 +17,19 @@ function StartScene:enter(sceneManager)
 
     self.helperText = HelperText()
 
-    local saveData = pd.datastore.read()
-    if not saveData then
-        error("No save data found")
-    end
-
     local screenHeight = pd.display.getHeight()
     local screenWidth = pd.display.getWidth()
 
     Header(StartScene.headerX)
 
-    self.mainMenuItems = {}
-    self.puzzleMenuItems = {}
-    self.difficultyMenuItems = {}
-    for _, difficulty in ipairs(DIFFICULTIES) do
-        self.puzzleMenuItems[difficulty] = {}
-    end
-
-    for i = 1, NUM_PUZZLES do
-        for _, difficulty in ipairs(DIFFICULTIES) do
-            local puzzleState = saveData["puzzles"][difficulty][i]["state"]
-
-            local puzzleMenuItem = PuzzleMenuItem(i, difficulty, puzzleState)
-
-            table.insert(self.puzzleMenuItems[difficulty], puzzleMenuItem)
-        end
-    end
-
-    for _, difficulty in ipairs(DIFFICULTIES) do
-        local difficultyMenuItem = DifficultyMenuItem(difficulty)
-
-        table.insert(self.difficultyMenuItems, difficultyMenuItem)
-    end
-
-    local selectPuzzleMenuItem = StartMenuItem("Select Puzzle")
-    local difficultyMenuItems = self.difficultyMenuItems
-    function selectPuzzleMenuItem:AButtonUp(menu)
-        menu:pushMenuItems(difficultyMenuItems)
-    end
-
-    table.insert(self.mainMenuItems, selectPuzzleMenuItem)
-    table.insert(self.mainMenuItems, StartMenuItem("Tutorial"))
-
-    if saveData["lastPlayed"] then
-        local continuePuzzleMenuItem = StartMenuItem("Continue Puzzle")
-        function continuePuzzleMenuItem:AButtonUp()
-            local difficulty = saveData["lastPlayed"]["difficulty"]
-            local number = saveData["lastPlayed"]["number"]
-            sceneManager:enter("game", difficulty, number)
-        end
-
-        table.insert(self.mainMenuItems, 1, continuePuzzleMenuItem)
-    end
+    self:setupMenuItems()
 
     local menuHeight = screenHeight - 20
 
     local menuX = (screenWidth - StartScene.menuWidth) - 35
     local menuY = (screenHeight - menuHeight) / 2
 
-    self.menu = Menu(self.mainMenuItems, self, menuX, menuY, StartScene.menuWidth, menuHeight, StartScene.menuItemHeight,
+    self.menu = Menu(self.mainMenuItems, menuX, menuY, StartScene.menuWidth, menuHeight, StartScene.menuItemHeight,
         StartScene.menuItemPadding)
     self.menu:hook({
         "AButtonHeld",
@@ -125,33 +79,99 @@ function StartScene:AButtonHeld()
     self.menu:AButtonHeld()
 end
 
-function StartScene:MenuItemAButtonUp(menuItem, menu)
-    if menuItem:isa(DifficultyMenuItem) then
-        self.helperText:add()
-        menu:pushMenuItems(self.puzzleMenuItems[menuItem.difficulty])
-    elseif menuItem:isa(PuzzleMenuItem) then
-        if menuItem.puzzleState == "completed" then
-            return
-        end
-        if menuItem.ignoreNext then
-            menuItem.ignoreNext = nil
-            return
-        end
-        self.sceneManager:enter("game", menuItem.puzzleDifficulty, menuItem.puzzleNumber)
-    end
+function StartScene:generatePuzzleMenuItemCallbacks(puzzleDifficulty, puzzleState, puzzleNumber)
+    local callbacks = {
+        AButtonUp = function()
+            if puzzleState == "completed" then
+                return
+            end
+            if self.ignoreNextMenuPress then
+                self.ignoreNextMenuPress = nil
+                return
+            end
+            self.sceneManager:enter("game", puzzleDifficulty, puzzleNumber)
+        end,
+        AButtonHeld = function()
+            self.ignoreNextMenuPress = true
+            self:handlePuzzleReset(puzzleDifficulty, puzzleNumber)
+            self.menu:forceUpdate()
+        end,
+        BButtonUp = function(menu)
+            self.helperText:remove()
+            menu:popMenuItems()
+        end,
+    }
+    return callbacks
 end
 
-function StartScene:MenuItemBButtonUp(menuItem)
-    if menuItem:isa(PuzzleMenuItem) then
-        self.helperText:remove()
+function StartScene:handlePuzzleReset(puzzleDifficulty, puzzleNumber)
+    local isLastPlayed = isLastPlayed(puzzleDifficulty, puzzleNumber)
+    if isLastPlayed then
+        table.remove(self.mainMenuItems, 1)
     end
+
+    resetPuzzle(puzzleDifficulty, puzzleNumber)
+
+    local callbacks = self:generatePuzzleMenuItemCallbacks(puzzleDifficulty, "not-started", puzzleNumber)
+    local puzzleMenuItem = PuzzleMenuItem(puzzleNumber, "not-started", callbacks)
+    self.puzzleMenuItems[puzzleDifficulty][puzzleNumber] = puzzleMenuItem
+
+    self.menu:forceUpdate()
 end
 
-function StartScene:MenuItemAButtonHeld(menuItem)
-    if menuItem:isa(PuzzleMenuItem) then
-        local isLastPlayed = isLastPlayed(menuItem.puzzleDifficulty, menuItem.puzzleNumber)
-        if isLastPlayed then
-            table.remove(self.mainMenuItems, 1)
+function StartScene:setupMenuItems()
+    local saveData = pd.datastore.read()
+    if not saveData then
+        error("No save data found")
+    end
+
+    self.mainMenuItems = {}
+    self.puzzleMenuItems = {}
+    self.difficultyMenuItems = {}
+
+    for _, difficulty in ipairs(DIFFICULTIES) do
+        local callbacks = {
+            AButtonUp = function(menu)
+                self.helperText:add()
+                menu:pushMenuItems(self.puzzleMenuItems[difficulty])
+            end,
+            BButtonUp = function(menu)
+                menu:popMenuItems()
+            end,
+        }
+
+        local difficultyMenuItem = DifficultyMenuItem(difficulty, callbacks)
+        table.insert(self.difficultyMenuItems, difficultyMenuItem)
+
+        self.puzzleMenuItems[difficulty] = {}
+    end
+
+    for i = 1, NUM_PUZZLES do
+        for _, difficulty in ipairs(DIFFICULTIES) do
+            local puzzleState = saveData["puzzles"][difficulty][i]["state"]
+            local callbacks = self:generatePuzzleMenuItemCallbacks(difficulty, puzzleState, i)
+            local puzzleMenuItem = PuzzleMenuItem(i, puzzleState, callbacks)
+            table.insert(self.puzzleMenuItems[difficulty], puzzleMenuItem)
         end
+    end
+
+    local selectPuzzleMenuItem = StartMenuItem("Select Puzzle", {
+        AButtonUp = function(menu)
+            menu:pushMenuItems(self.difficultyMenuItems)
+        end,
+    })
+    table.insert(self.mainMenuItems, selectPuzzleMenuItem)
+    table.insert(self.mainMenuItems, StartMenuItem("Tutorial"))
+
+    if saveData["lastPlayed"] then
+        local callbacks = {
+            AButtonUp = function()
+                local difficulty = saveData["lastPlayed"]["difficulty"]
+                local number = saveData["lastPlayed"]["number"]
+                self.sceneManager:enter("game", difficulty, number)
+            end,
+        }
+        local continuePuzzleMenuItem = StartMenuItem("Continue Puzzle", callbacks)
+        table.insert(self.mainMenuItems, 1, continuePuzzleMenuItem)
     end
 end

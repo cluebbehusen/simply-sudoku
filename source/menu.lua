@@ -3,8 +3,18 @@ local gfx <const> = pd.graphics
 
 class("MenuItem").extends()
 
+function MenuItem:init()
+    self.callbacks = {}
+end
+
 function MenuItem:draw(selected, x, y, width, height)
     error('This is an abstract method. It must be overwritten.')
+end
+
+function MenuItem:invokeCallback(callbackName, ...)
+    if self.callbacks and self.callbacks[callbackName] then
+        self.callbacks[callbackName](...)
+    end
 end
 
 class("Menu").extends(gfx.sprite)
@@ -16,13 +26,11 @@ Menu.reservedHandlers = {
     "downButtonUp",
 }
 
-function Menu:init(initialMenuItems, menuOwner, x, y, width, height, cellHeight, cellPadding)
+function Menu:init(initialMenuItems, x, y, width, height, cellHeight, cellPadding)
     self.gridviewWidth = width
     self.gridviewHeight = height
     self.cellHeight = cellHeight
     self.cellPadding = cellPadding
-
-    self.menuOwner = menuOwner
 
     self.gridview = pd.ui.gridview.new(0, cellHeight)
     self.gridview:setCellPadding(0, 0, cellPadding, cellPadding)
@@ -111,13 +119,7 @@ function Menu:emit(event, ...)
     local selectedRow = self.gridview:getSelectedRow()
     local selectedMenuItem = self.stack[#self.stack][selectedRow]
 
-    if selectedMenuItem[event] then
-        selectedMenuItem[event](selectedMenuItem, self, ...)
-    end
-    local menuItemEvent = "MenuItem" .. event
-    if self.menuOwner[menuItemEvent] then
-        self.menuOwner[menuItemEvent](self.menuOwner, selectedMenuItem, self, ...)
-    end
+    selectedMenuItem:invokeCallback(event, self, ...)
 end
 
 function Menu:draw()

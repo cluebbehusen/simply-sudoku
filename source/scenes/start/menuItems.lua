@@ -3,12 +3,9 @@ local gfx <const> = pd.graphics
 
 class("StartMenuItem").extends(MenuItem)
 
-function StartMenuItem:init(text)
+function StartMenuItem:init(text, callbacks)
     self.text = text
-end
-
-function StartMenuItem:setText(text)
-    self.text = text
+    self.callbacks = callbacks
 end
 
 function StartMenuItem:draw(selected, x, y, width, height)
@@ -30,27 +27,22 @@ function StartMenuItem:draw(selected, x, y, width, height)
     image:draw(x, y)
 end
 
-function StartMenuItem:BButtonUp(menu)
-    menu:popMenuItems()
-end
-
 class("PuzzleMenuItem").extends(StartMenuItem)
 
-function PuzzleMenuItem:init(puzzleNumber, puzzleDifficulty, puzzleState)
-    self.puzzleNumber = puzzleNumber
-    self.puzzleDifficulty = puzzleDifficulty
-    self.puzzleState = puzzleState
-    self.text = "Puzzle " .. puzzleNumber
+function PuzzleMenuItem:init(puzzleNumber, puzzleState, callbacks)
+    local text = "Puzzle " .. puzzleNumber
     if puzzleState == "in-progress" then
-        self.text = self.text .. " ⏳"
+        text = text .. " ⏳"
     elseif puzzleState == "completed" then
-        self.text = self.text .. " ⎷"
+        text = text .. " ⎷"
     end
+
+    StartMenuItem.init(self, text, callbacks)
 end
 
 function PuzzleMenuItem:AButtonHeld(menu)
     resetPuzzle(self.puzzleDifficulty, self.puzzleNumber)
-    self:setText("Puzzle " .. self.puzzleNumber)
+    self.text = "Puzzle " .. self.puzzleNumber
     self.puzzleState = "not-started"
     self.ignoreNext = true
     menu:forceUpdate()
@@ -58,7 +50,8 @@ end
 
 class("DifficultyMenuItem").extends(StartMenuItem)
 
-function DifficultyMenuItem:init(difficulty)
-    self.difficulty = difficulty
-    self.text = difficulty:gsub("^%l", string.upper)
+function DifficultyMenuItem:init(difficulty, callbacks)
+    local text = difficulty:gsub("^%l", string.upper)
+
+    StartMenuItem.init(self, text, callbacks)
 end
