@@ -29,6 +29,8 @@ function Board:init(x, y, puzzleDifficulty, puzzleNumber, sceneManager)
     local progress = puzzleSaveData["progress"]
     local puzzleAnnotations = puzzleSaveData["annotations"]
 
+    self.blockCellChange = false
+
     self.selRow = 1
     self.selColumn = 1
 
@@ -53,7 +55,7 @@ function Board:init(x, y, puzzleDifficulty, puzzleNumber, sceneManager)
         end
     end
 
-    self.cells[self.selRow][self.selColumn]:setSelected()
+    self:getSelectedCell():setSelected()
 
     self:setCenter(0, 0)
     self:setImage(pd.datastore.readImage("board"))
@@ -61,106 +63,113 @@ function Board:init(x, y, puzzleDifficulty, puzzleNumber, sceneManager)
     self:add()
 end
 
+function Board:getSelectedCell()
+    return self.cells[self.selRow][self.selColumn]
+end
+
 function Board:BButtonDown()
-    if self.cells[self.selRow][self.selColumn].value then
+    if self:getSelectedCell():getValue() then
         return
     end
-    if self.cells[self.selRow][self.selColumn]:isAnnotating() then
-        self.cells[self.selRow][self.selColumn]:unsetAnnotating()
+    if self:getSelectedCell():isAnnotating() then
+        self:getSelectedCell():unsetAnnotating()
     else
-        self.cells[self.selRow][self.selColumn]:setAnnotating()
+        self:getSelectedCell():setAnnotating()
     end
 end
 
 function Board:AButtonDown()
-    if self.cells[self.selRow][self.selColumn]:isAnnotating() then
-        self.cells[self.selRow][self.selColumn]:flipSelectedAnnotation()
+    if self.blockCellChange then
+        return
+    end
+    if self:getSelectedCell():isAnnotating() then
+        self:getSelectedCell():flipSelectedAnnotation()
     else
         self:incrementSelectedCell()
     end
 end
 
 function Board:AButtonUp()
-    if self.cells[self.selRow][self.selColumn]:isAnnotating() then
+    if self:getSelectedCell():isAnnotating() then
         return
     end
     self:checkSolved()
 end
 
 function Board:upButtonDown()
-    if self.cells[self.selRow][self.selColumn]:isAnnotating() then
-        self.cells[self.selRow][self.selColumn]:selectPrevAnnotationRow()
+    if self:getSelectedCell():isAnnotating() then
+        self:getSelectedCell():selectPrevAnnotationRow()
     else
         self:selectPrevRow()
     end
 end
 
 function Board:downButtonDown()
-    if self.cells[self.selRow][self.selColumn]:isAnnotating() then
-        self.cells[self.selRow][self.selColumn]:selectNextAnnotationRow()
+    if self:getSelectedCell():isAnnotating() then
+        self:getSelectedCell():selectNextAnnotationRow()
     else
         self:selectNextRow()
     end
 end
 
 function Board:rightButtonDown()
-    if self.cells[self.selRow][self.selColumn]:isAnnotating() then
-        self.cells[self.selRow][self.selColumn]:selectNextAnnotationColumn()
+    if self:getSelectedCell():isAnnotating() then
+        self:getSelectedCell():selectNextAnnotationColumn()
     else
         self:selectNextColumn()
     end
 end
 
 function Board:leftButtonDown()
-    if self.cells[self.selRow][self.selColumn]:isAnnotating() then
-        self.cells[self.selRow][self.selColumn]:selectPrevAnnotationColumn()
+    if self:getSelectedCell():isAnnotating() then
+        self:getSelectedCell():selectPrevAnnotationColumn()
     else
         self:selectPrevColumn()
     end
 end
 
 function Board:selectNextRow()
-    self.cells[self.selRow][self.selColumn]:setUnselected()
+    self:getSelectedCell():setUnselected()
     if self.selRow == 9 then
         self.selRow = 1
     else
         self.selRow += 1
     end
-    self.cells[self.selRow][self.selColumn]:setSelected()
+    self:getSelectedCell():setSelected()
 end
 
 function Board:selectPrevRow()
-    self.cells[self.selRow][self.selColumn]:setUnselected()
+    self:getSelectedCell():setUnselected()
     if self.selRow == 1 then
         self.selRow = 9
     else
         self.selRow -= 1
     end
-    self.cells[self.selRow][self.selColumn]:setSelected()
+    self:getSelectedCell():setSelected()
 end
 
 function Board:selectNextColumn()
-    self.cells[self.selRow][self.selColumn]:setUnselected()
+    self:getSelectedCell():setUnselected()
     if self.selColumn == 9 then
         self.selColumn = 1
     else
         self.selColumn += 1
     end
-    self.cells[self.selRow][self.selColumn]:setSelected()
+    self:getSelectedCell():setSelected()
 end
 
 function Board:selectPrevColumn()
-    self.cells[self.selRow][self.selColumn]:setUnselected()
+    self:getSelectedCell():setUnselected()
     if self.selColumn == 1 then
         self.selColumn = 9
     else
         self.selColumn -= 1
     end
-    self.cells[self.selRow][self.selColumn]:setSelected()
+    self:getSelectedCell():setSelected()
 end
 
 function Board:incrementSelectedCell()
-    self.cells[self.selRow][self.selColumn]:incrementValue()
+    self:getSelectedCell():incrementValue()
 end
 
 function Board:isSolved()
@@ -175,8 +184,9 @@ function Board:isSolved()
 end
 
 function Board:checkSolved()
-    if self:isSolved() then
-        pd.timer.performAfterDelay(500, function ()
+    if true then
+        self.blockCellChange = true
+        pd.timer.performAfterDelay(750, function ()
             self.sceneManager:enter("complete", true)
         end)
     end
