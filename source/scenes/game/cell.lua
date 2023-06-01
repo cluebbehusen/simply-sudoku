@@ -47,6 +47,10 @@ function Cell:init(x, y, value, specified, annotations)
     self:add()
 end
 
+function Cell:getValue()
+    return self.value
+end
+
 function Cell:setAnnotating()
     self.selectedAnnotation = 1
     self:updateImage()

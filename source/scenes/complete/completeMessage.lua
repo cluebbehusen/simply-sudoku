@@ -8,36 +8,18 @@ function CompleteMessage:init()
 
     gfx.setFont(gfx.font.new("fonts/systemBig"))
 
-    local mainText = "Puzzle\nComplete!"
-    local mainTextWidth, mainTextHeight = gfx.getTextSize(mainText)
+    local text = "Puzzle\nComplete!"
+    local textWidth, textHeight = gfx.getTextSize(text)
 
-    local mainTextImage = gfx.image.new(mainTextWidth, mainTextHeight)
+    local textImage = gfx.image.new(textWidth, textHeight)
 
-    gfx.pushContext(mainTextImage)
-    gfx.drawTextAligned(mainText, mainTextWidth / 2, 0, kTextAlignment.center)
-    gfx.popContext()
-
-    gfx.setFont(gfx.font.new("fonts/system"))
-
-    local subText = "Ⓐ Main Menu"
-    local subTextWidth, subTextHeight = gfx.getTextSize(subText)
-
-    local subTextImage = gfx.image.new(subTextWidth, subTextHeight)
-
-    gfx.pushContext(subTextImage)
-    gfx.drawText(subText, 0, 0)
+    gfx.pushContext(textImage)
+    gfx.drawTextAligned(text, textWidth / 2, 0, kTextAlignment.center)
     gfx.popContext()
 
     gfx.setFont(previousFont)
 
-    local image = gfx.image.new(mainTextWidth, mainTextHeight + subTextHeight + 20)
-
-    gfx.pushContext(image)
-    mainTextImage:draw(0, 0)
-    subTextImage:draw((mainTextWidth - subTextWidth) / 2, mainTextHeight + 20)
-    gfx.popContext()
-
-    self:moveTo(pd.display.getWidth() / 2, pd.display.getHeight() / 2)
-    self:setImage(image)
+    self:moveTo(pd.display.getWidth() / 2, pd.display.getHeight() / 2 - textHeight / 2 + 15)
+    self:setImage(textImage)
     self:add()
 end
