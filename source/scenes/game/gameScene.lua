@@ -16,17 +16,29 @@ function GameScene:enter(sceneManager, previousScene, puzzleDifficulty, puzzleNu
 
     self.board = Board(boardX, boardY, puzzleDifficulty, puzzleNumber, sceneManager)
 
+    local saveData = pd.datastore.read()
+    if not saveData then
+        error("No save data found")
+    end
+    local puzzleState = saveData["puzzles"][puzzleDifficulty][puzzleNumber]["state"]
+
     local menu = pd.getSystemMenu()
 
-    menu:addMenuItem("main menu", function()
-        sceneManager:enter("start")
-    end)
-    menu:addMenuItem("tutorial", function()
-        sceneManager:enter("tutorial")
-    end)
-    menu:addMenuItem("annotate", function()
-        self.board:autoAnnotate()
-    end)
+    if puzzleState == "completed" then
+        menu:addMenuItem("main menu", function()
+            sceneManager:enter("start", true)
+        end)
+    else
+        menu:addMenuItem("main menu", function()
+            sceneManager:enter("start")
+        end)
+        menu:addMenuItem("tutorial", function()
+            sceneManager:enter("tutorial")
+        end)
+        menu:addMenuItem("annotate", function()
+            self.board:autoAnnotate()
+        end)
+    end
 
     self.keyTimers = {}
 end

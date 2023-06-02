@@ -28,8 +28,12 @@ function Board:init(x, y, puzzleDifficulty, puzzleNumber, sceneManager)
 
     local progress = puzzleSaveData["progress"]
     local puzzleAnnotations = puzzleSaveData["annotations"]
+    local state = puzzleSaveData["state"]
 
     self.blockCellChange = false
+    if state == "completed" then
+        self.blockCellChange = true
+    end
 
     self.selRow = 1
     self.selColumn = 1
@@ -90,6 +94,9 @@ function Board:AButtonDown()
 end
 
 function Board:AButtonUp()
+    if self.blockCellChange then
+        return
+    end
     if self:getSelectedCell():isAnnotating() then
         return
     end
@@ -186,7 +193,7 @@ end
 function Board:checkSolved()
     if self:isSolved() then
         self.blockCellChange = true
-        pd.timer.performAfterDelay(750, function ()
+        pd.timer.performAfterDelay(500, function ()
             self.sceneManager:enter("complete", true)
         end)
     end

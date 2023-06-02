@@ -82,9 +82,6 @@ end
 function StartScene:generatePuzzleMenuItemCallbacks(puzzleDifficulty, puzzleState, puzzleNumber)
     local callbacks = {
         AButtonUp = function()
-            if puzzleState == "completed" then
-                return
-            end
             if self.ignoreNextMenuPress then
                 self.ignoreNextMenuPress = nil
                 return
