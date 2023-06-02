@@ -17,13 +17,15 @@ import "sceneManager"
 import "scenes/game/gameScene"
 import "scenes/start/startScene"
 import "scenes/complete/completeScene"
+import "scenes/tutorial/tutorialScene"
 
 maybeInstantiateSaveData()
 
 local scenes = {
     game = GameScene(),
     start = StartScene(),
-    complete = CompleteScene()
+    complete = CompleteScene(),
+    tutorial = TutorialScene(),
 }
 
 local sceneManager = SceneManager(scenes, "start")

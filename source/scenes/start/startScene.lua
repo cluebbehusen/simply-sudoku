@@ -161,7 +161,13 @@ function StartScene:setupMenuItems()
         end,
     })
     table.insert(self.mainMenuItems, selectPuzzleMenuItem)
-    table.insert(self.mainMenuItems, StartMenuItem("Tutorial"))
+
+    local tutorialMenuItem = StartMenuItem("Tutorial", {
+        AButtonUp = function()
+            self.sceneManager:enter("tutorial")
+        end,
+    })
+    table.insert(self.mainMenuItems, tutorialMenuItem)
 
     if saveData["lastPlayed"] then
         local callbacks = {
