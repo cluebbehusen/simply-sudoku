@@ -184,7 +184,7 @@ function Board:isSolved()
 end
 
 function Board:checkSolved()
-    if true then
+    if self:isSolved() then
         self.blockCellChange = true
         pd.timer.performAfterDelay(750, function ()
             self.sceneManager:enter("complete", true)
