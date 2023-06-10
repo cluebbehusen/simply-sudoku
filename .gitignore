@@ -2,5 +2,6 @@
 .DS_Store
 .nova
 *.pdx
+*.pdx.zip
 notes.txt
 parse.py
