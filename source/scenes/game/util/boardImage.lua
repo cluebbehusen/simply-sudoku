@@ -1,6 +1,9 @@
 local pd <const> = playdate
 local gfx <const> = pd.graphics
 
+--- Writes the board image to the datastore for faster loading later
+--- @param boardSize number The size of the board
+--- @param cellSize number The size of the cells
 function writeBoardImage(boardSize, cellSize)
     local paddedBoardSize = boardSize - 2
     local image = gfx.image.new(boardSize, boardSize)

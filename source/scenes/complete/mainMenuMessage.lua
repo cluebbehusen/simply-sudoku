@@ -3,6 +3,7 @@ local gfx <const> = pd.graphics
 
 class("MainMenuMessage").extends(gfx.sprite)
 
+--- Creates a new main menu message
 function MainMenuMessage:init()
     local previousFont = gfx.getFont()
 

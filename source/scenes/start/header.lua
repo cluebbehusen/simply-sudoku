@@ -3,6 +3,8 @@ local gfx <const> = pd.graphics
 
 class("Header").extends(gfx.sprite)
 
+--- Creates a new header
+--- @param x number The x position of the header
 function Header:init(x)
     local previousFont = gfx.getFont()
 

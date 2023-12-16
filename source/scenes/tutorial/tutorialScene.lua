@@ -5,6 +5,8 @@ import "tutorialText"
 
 class("TutorialScene").extends()
 
+--- Enters the tutorial scene
+--- @param sceneManager table The scene manager
 function TutorialScene:enter(sceneManager)
     self.sceneManager = sceneManager
 
@@ -30,12 +32,14 @@ function TutorialScene:enter(sceneManager)
     toggleAnnotation:moveTo(15, 185)
 end
 
+--- Leaves the tutorial scene
 function TutorialScene:leave()
     local menu = pd.getSystemMenu()
     menu:removeAllMenuItems()
     gfx.sprite.removeAll()
 end
 
+--- Handles the B button up event
 function TutorialScene:BButtonUp()
     self.sceneManager:enter("start")
 end

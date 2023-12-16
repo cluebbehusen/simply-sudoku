@@ -1,5 +1,6 @@
 local pd <const> = playdate
 
+--- Instantiates the default save data when the game is first run
 local function instantiateSaveData()
     local saveData = {
         lastPlayed = nil,
@@ -24,7 +25,7 @@ local function instantiateSaveData()
     pd.datastore.write(saveData)
 end
 
-
+--- Instantiates the default save data if it doesn't exist
 function maybeInstantiateSaveData()
     local saveData = pd.datastore.read()
 
@@ -33,6 +34,9 @@ function maybeInstantiateSaveData()
     end
 end
 
+--- Checks if the supplied difficulty and number match the last played puzzle
+--- @param difficulty string The difficulty
+--- @param number number The number
 function isLastPlayed(difficulty, number)
     local saveData = pd.datastore.read()
     if not saveData then
@@ -47,6 +51,9 @@ function isLastPlayed(difficulty, number)
     return lastPlayed["difficulty"] == difficulty and lastPlayed["number"] == number
 end
 
+--- Resets the progress of a single puzzle
+--- @param difficulty string The difficulty
+--- @param number number The number
 function resetPuzzle(difficulty, number)
     local saveData = pd.datastore.read()
     if not saveData then

@@ -3,6 +3,7 @@ local gfx <const> = pd.graphics
 
 class("CompleteMessage").extends(gfx.sprite)
 
+--- Creates a new complete message
 function CompleteMessage:init()
     local previousFont = gfx.getFont()
 

@@ -1,6 +1,10 @@
 local pd <const> = playdate
 local gfx <const> = pd.graphics
 
+--- Creates a string key for a cell image
+--- @param specified boolean Whether the cell has a specified (given) value
+--- @param value? number The value of the cell
+--- @return string key The key
 function getImageKey(specified, value)
     local specifiedString = specified and "specified" or "unspecified"
     if value then
@@ -10,6 +14,9 @@ function getImageKey(specified, value)
     return specifiedString
 end
 
+--- Creates a function that returns a cell image based on size
+--- @param cellSize number The size of the cell
+--- @return function getCellImage The function that returns a cell image
 local function getCellImageWrapper(cellSize)
     return function(specified, value)
         local image = gfx.image.new(cellSize, cellSize)
@@ -32,6 +39,9 @@ local function getCellImageWrapper(cellSize)
     end
 end
 
+--- Creates a table of cell images for faster loading later
+--- @param cellSize number The size of the cell
+--- @return table images The table of cell images
 function getCellImages(cellSize)
     local previousFont = gfx.getFont()
 

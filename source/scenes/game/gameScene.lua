@@ -5,6 +5,11 @@ import "board"
 
 class("GameScene").extends()
 
+--- Enters the game scene
+--- @param sceneManager table The scene manager
+--- @param previousScene string The previous scene
+--- @param puzzleDifficulty string The puzzle difficulty
+--- @param puzzleNumber number The puzzle number
 function GameScene:enter(sceneManager, previousScene, puzzleDifficulty, puzzleNumber)
     self.sceneManager = sceneManager
 
@@ -41,25 +46,36 @@ function GameScene:enter(sceneManager, previousScene, puzzleDifficulty, puzzleNu
     end
 
     self.keyTimers = {}
+
+    local navigationHandlerKeys = {
+        "upButton",
+        "downButton",
+        "leftButton",
+        "rightButton"
+    }
+    for _, v in ipairs(navigationHandlerKeys) do
+        local downHandler = v .. "Down"
+        local upHandler = v .. "Up"
+        self[upHandler] = function() self:removeTimer(v) end
+        self[downHandler] = function() self:addTimer(v, function() self.board[downHandler](self.board) end) end
+    end
 end
 
+--- Leaves the game scene
+--- @param sceneManager table The scene manager
+--- @param nextScene string The next scene
+--- @param puzzleCompleted boolean Whether the puzzle was completed
 function GameScene:leave(sceneManager, nextScene, puzzleCompleted)
     self.board:save(puzzleCompleted)
 
     local menu = pd.getSystemMenu()
     menu:removeAllMenuItems()
     gfx.sprite.removeAll()
-
-    local allTimers = pd.timer.allTimers()
-    if not allTimers then
-        return
-    end
-
-    for _, timer in ipairs(allTimers) do
-        timer:remove()
-    end
+    removeAllTimers()
 end
 
+--- Removes a timer
+--- @param name string The timer name
 function GameScene:removeTimer(name)
     if self.keyTimers[name] then
         self.keyTimers[name]:remove()
@@ -67,9 +83,12 @@ function GameScene:removeTimer(name)
     end
 end
 
+--- Adds a timer
+--- @param name string The timer name
+--- @param callback function The callback for the timer
 function GameScene:addTimer(name, callback)
     if self.keyTimers[name] then
-        self:removeTimer()
+        self:removeTimer(name)
     end
     self.keyTimers[name] = pd.timer.keyRepeatTimer(callback)
 end
@@ -85,38 +104,6 @@ end
 
 function GameScene:BButtonDown()
     self.board:BButtonDown()
-end
-
-function GameScene:upButtonDown()
-    self:addTimer("upButton", function() self.board:upButtonDown() end)
-end
-
-function GameScene:upButtonUp()
-    self:removeTimer("upButton")
-end
-
-function GameScene:downButtonDown()
-    self:addTimer("downButton", function() self.board:downButtonDown() end)
-end
-
-function GameScene:downButtonUp()
-    self:removeTimer("downButton")
-end
-
-function GameScene:leftButtonDown()
-    self:addTimer("leftButton", function() self.board:leftButtonDown() end)
-end
-
-function GameScene:leftButtonUp()
-    self:removeTimer("leftButton")
-end
-
-function GameScene:rightButtonDown()
-    self:addTimer("rightButton", function() self.board:rightButtonDown() end)
-end
-
-function GameScene:rightButtonUp()
-    self:removeTimer("rightButton")
 end
 
 function GameScene:gameWillTerminate()

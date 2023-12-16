@@ -6,6 +6,8 @@ import "mainMenuMessage"
 
 class("CompleteScene").extends()
 
+--- Enters the complete scene
+--- @param sceneManager table The scene manager
 function CompleteScene:enter(sceneManager)
     self.sceneManager = sceneManager
     self.transitionEnabled = false
@@ -19,18 +21,16 @@ function CompleteScene:enter(sceneManager)
     end)
 end
 
+--- Leaves the complete scene
 function CompleteScene:leave()
     gfx.sprite.removeAll()
-    local allTimers = pd.timer.allTimers()
-    if not allTimers then
-        return
-    end
-
-    for _, timer in ipairs(allTimers) do
-        timer:remove()
-    end
+    removeAllTimers()
 end
 
+--- Handles the A button up event
 function CompleteScene:AButtonUp()
+    if not self.transitionEnabled then
+        return
+    end
     self.sceneManager:enter("start")
 end
