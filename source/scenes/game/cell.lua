@@ -194,7 +194,7 @@ end
 
 --- Updates the cell image
 function Cell:updateImage()
-    local imageKey = getImageKey(self.specified, self.value)
+    local imageKey = getCellImageKey(self.specified, self.value)
     local image = Cell.images[imageKey]
 
     if self.annotations then

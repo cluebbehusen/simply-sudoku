@@ -5,7 +5,7 @@ local gfx <const> = pd.graphics
 --- @param specified boolean Whether the cell has a specified (given) value
 --- @param value? number The value of the cell
 --- @return string key The key
-function getImageKey(specified, value)
+function getCellImageKey(specified, value)
     local specifiedString = specified and "specified" or "unspecified"
     if value then
         local valueString = tostring(value)
