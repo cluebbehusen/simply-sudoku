@@ -10,6 +10,12 @@ Board.size = Cell.size * 9 + 12
 
 writeBoardImage(Board.size, Cell.size)
 
+--- Creates a new board
+--- @param x number The x position
+--- @param y number The y position
+--- @param puzzleDifficulty string The difficulty of the puzzle
+--- @param puzzleNumber number The number of the puzzle
+--- @param sceneManager table The scene manager
 function Board:init(x, y, puzzleDifficulty, puzzleNumber, sceneManager)
     self.puzzleDifficulty = puzzleDifficulty
     self.puzzleNumber = puzzleNumber
@@ -67,10 +73,13 @@ function Board:init(x, y, puzzleDifficulty, puzzleNumber, sceneManager)
     self:add()
 end
 
+--- Gets the selected cell
+--- @return table selectedCell The selected cell
 function Board:getSelectedCell()
     return self.cells[self.selRow][self.selColumn]
 end
 
+--- Handles the B button down event
 function Board:BButtonDown()
     if self:getSelectedCell():getValue() then
         return
@@ -82,6 +91,7 @@ function Board:BButtonDown()
     end
 end
 
+--- Handles the A button down event
 function Board:AButtonDown()
     if self.blockCellChange then
         return
@@ -93,6 +103,7 @@ function Board:AButtonDown()
     end
 end
 
+--- Handles the A button up event
 function Board:AButtonUp()
     if self.blockCellChange then
         return
@@ -103,6 +114,7 @@ function Board:AButtonUp()
     self:checkSolved()
 end
 
+--- Handles the up button down event
 function Board:upButtonDown()
     if self:getSelectedCell():isAnnotating() then
         self:getSelectedCell():selectPrevAnnotationRow()
@@ -111,6 +123,7 @@ function Board:upButtonDown()
     end
 end
 
+--- Handles the down button down event
 function Board:downButtonDown()
     if self:getSelectedCell():isAnnotating() then
         self:getSelectedCell():selectNextAnnotationRow()
@@ -119,6 +132,7 @@ function Board:downButtonDown()
     end
 end
 
+--- Handles the right button down event
 function Board:rightButtonDown()
     if self:getSelectedCell():isAnnotating() then
         self:getSelectedCell():selectNextAnnotationColumn()
@@ -127,6 +141,7 @@ function Board:rightButtonDown()
     end
 end
 
+--- Handles the left button down event
 function Board:leftButtonDown()
     if self:getSelectedCell():isAnnotating() then
         self:getSelectedCell():selectPrevAnnotationColumn()
@@ -135,6 +150,7 @@ function Board:leftButtonDown()
     end
 end
 
+--- Selects the next row on the board with wraparound
 function Board:selectNextRow()
     self:getSelectedCell():setUnselected()
     if self.selRow == 9 then
@@ -145,6 +161,7 @@ function Board:selectNextRow()
     self:getSelectedCell():setSelected()
 end
 
+--- Selects the previous row on the board with wraparound
 function Board:selectPrevRow()
     self:getSelectedCell():setUnselected()
     if self.selRow == 1 then
@@ -155,6 +172,7 @@ function Board:selectPrevRow()
     self:getSelectedCell():setSelected()
 end
 
+--- Selects the next column on the board with wraparound
 function Board:selectNextColumn()
     self:getSelectedCell():setUnselected()
     if self.selColumn == 9 then
@@ -165,6 +183,7 @@ function Board:selectNextColumn()
     self:getSelectedCell():setSelected()
 end
 
+--- Selects the previous column on the board with wraparound
 function Board:selectPrevColumn()
     self:getSelectedCell():setUnselected()
     if self.selColumn == 1 then
@@ -179,6 +198,8 @@ function Board:incrementSelectedCell()
     self:getSelectedCell():incrementValue()
 end
 
+--- Gets whether the board is solved
+--- @return boolean isSolved Whether the board is solved
 function Board:isSolved()
     for row = 1, 9 do
         for column = 1, 9 do
@@ -190,15 +211,20 @@ function Board:isSolved()
     return true
 end
 
+--- Checks if the board is solved and if so, enters the complete scene
 function Board:checkSolved()
     if self:isSolved() then
         self.blockCellChange = true
-        pd.timer.performAfterDelay(500, function ()
+        pd.timer.performAfterDelay(500, function()
             self.sceneManager:enter("complete", true)
         end)
     end
 end
 
+--- Gets whether the given value is in the given row
+--- @param value number The value to check
+--- @param row number The row to check
+--- @return boolean isValueInRow Whether the value is in the row
 function Board:isValueInRow(value, row)
     for column = 1, 9 do
         if self.cells[row][column].value == value then
@@ -208,6 +234,10 @@ function Board:isValueInRow(value, row)
     return false
 end
 
+--- Gets whether the given value is in the given column
+--- @param value number The value to check
+--- @param column number The column to check
+--- @return boolean isValueInColumn Whether the value is in the column
 function Board:isValueInColumn(value, column)
     for row = 1, 9 do
         if self.cells[row][column].value == value then
@@ -217,6 +247,11 @@ function Board:isValueInColumn(value, column)
     return false
 end
 
+--- Gets whether the given value is in the given box
+--- @param value number The value to check
+--- @param row number The row to check
+--- @param column number The column to check
+--- @return boolean isValueInBox Whether the value is in the box
 function Board:isValueInBox(value, row, column)
     local boxRow = math.floor((row - 1) / 3) * 3 + 1
     local boxColumn = math.floor((column - 1) / 3) * 3 + 1
@@ -230,6 +265,7 @@ function Board:isValueInBox(value, row, column)
     return false
 end
 
+--- Annotates the given cell
 function Board:annotateCell(row, column)
     local cell = self.cells[row][column]
     if cell.value then
@@ -254,6 +290,7 @@ function Board:annotateCell(row, column)
     cell:setAnnotations(annotations)
 end
 
+--- Annotates all cells on the board
 function Board:autoAnnotate()
     for row = 1, 9 do
         for column = 1, 9 do
@@ -262,6 +299,8 @@ function Board:autoAnnotate()
     end
 end
 
+--- Save the board state
+--- @param completed boolean Whether the board is completed
 function Board:save(completed)
     local saveData = pd.datastore.read()
     if not saveData then
