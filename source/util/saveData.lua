@@ -35,7 +35,7 @@ function maybeInstantiateSaveData()
 end
 
 --- Checks if the supplied difficulty and number match the last played puzzle
---- @param difficulty difficulty The difficulty
+--- @param difficulty string The difficulty
 --- @param number number The number
 function isLastPlayed(difficulty, number)
     local saveData = pd.datastore.read()
@@ -52,7 +52,7 @@ function isLastPlayed(difficulty, number)
 end
 
 --- Resets the progress of a single puzzle
---- @param difficulty difficulty The difficulty
+--- @param difficulty string The difficulty
 --- @param number number The number
 function resetPuzzle(difficulty, number)
     local saveData = pd.datastore.read()

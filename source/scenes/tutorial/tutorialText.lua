@@ -3,6 +3,8 @@ local gfx <const> = pd.graphics
 
 class("TutorialText").extends(gfx.sprite)
 
+--- Creates a new tutorial text
+--- @param text string The text to display
 function TutorialText:init(text)
     local previousFont = gfx.getFont()
 

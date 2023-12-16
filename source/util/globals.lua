@@ -1,4 +1,3 @@
---- @enum difficulty
 DIFFICULTIES = {
     "easy",
     "medium",

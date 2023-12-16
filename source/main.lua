@@ -12,6 +12,7 @@ gfx.setFont(gfx.font.new("fonts/system"))
 
 import "util/globals"
 import "util/saveData"
+import "util/timers"
 import "menu"
 import "sceneManager"
 import "scenes/game/gameScene"

@@ -12,6 +12,8 @@ StartScene.menuItemHeight = 33
 StartScene.menuItemPadding = 4
 StartScene.headerX = 95
 
+--- Enters the start scene
+--- @param sceneManager table The scene manager
 function StartScene:enter(sceneManager)
     self.sceneManager = sceneManager
 
@@ -36,50 +38,31 @@ function StartScene:enter(sceneManager)
         "AButtonUp",
         "BButtonUp",
     })
+
+    local handlers = {
+        "upButtonDown",
+        "upButtonUp",
+        "downButtonDown",
+        "downButtonUp",
+        "AButtonUp",
+        "BButtonUp",
+        "AButtonHeld",
+    }
+    for _, v in ipairs(handlers) do
+        self[v] = function() self.menu[v](self.menu) end
+    end
 end
 
+--- Leaves the start scene
 function StartScene:leave()
     gfx.sprite.removeAll()
-
-    local allTimers = pd.timer.allTimers()
-    if not allTimers then
-        return
-    end
-
-    for _, timer in ipairs(allTimers) do
-        timer:remove()
-    end
+    removeAllTimers()
 end
 
-function StartScene:upButtonDown()
-    self.menu:upButtonDown()
-end
-
-function StartScene:upButtonUp()
-    self.menu:upButtonUp()
-end
-
-function StartScene:downButtonDown()
-    self.menu:downButtonDown()
-end
-
-function StartScene:downButtonUp()
-    self.menu:downButtonUp()
-end
-
-function StartScene:AButtonUp()
-    self.menu:AButtonUp()
-end
-
-function StartScene:BButtonUp()
-    self.menu:BButtonUp()
-end
-
-function StartScene:AButtonHeld()
-    self.menu:AButtonHeld()
-end
-
-function StartScene:generatePuzzleMenuItemCallbacks(puzzleDifficulty, puzzleState, puzzleNumber)
+--- Generates the callbacks for a puzzle menu item
+--- @param puzzleDifficulty string The puzzle difficulty
+--- @param puzzleNumber number The puzzle number
+function StartScene:generatePuzzleMenuItemCallbacks(puzzleDifficulty, puzzleNumber)
     local callbacks = {
         AButtonUp = function()
             if self.ignoreNextMenuPress then
@@ -102,7 +85,7 @@ function StartScene:generatePuzzleMenuItemCallbacks(puzzleDifficulty, puzzleStat
 end
 
 --- Resets a puzzle to its initial state
---- @param puzzleDifficulty difficulty The puzzle difficulty
+--- @param puzzleDifficulty string The puzzle difficulty
 --- @param puzzleNumber number The puzzle number
 function StartScene:handlePuzzleReset(puzzleDifficulty, puzzleNumber)
     local isLastPlayed = isLastPlayed(puzzleDifficulty, puzzleNumber)
@@ -112,13 +95,14 @@ function StartScene:handlePuzzleReset(puzzleDifficulty, puzzleNumber)
 
     resetPuzzle(puzzleDifficulty, puzzleNumber)
 
-    local callbacks = self:generatePuzzleMenuItemCallbacks(puzzleDifficulty, "not-started", puzzleNumber)
+    local callbacks = self:generatePuzzleMenuItemCallbacks(puzzleDifficulty, puzzleNumber)
     local puzzleMenuItem = PuzzleMenuItem(puzzleNumber, "not-started", callbacks)
     self.puzzleMenuItems[puzzleDifficulty][puzzleNumber] = puzzleMenuItem
 
     self.menu:forceUpdate()
 end
 
+--- Sets up the menu items
 function StartScene:setupMenuItems()
     local saveData = pd.datastore.read()
     if not saveData then
@@ -148,8 +132,7 @@ function StartScene:setupMenuItems()
 
     for i = 1, NUM_PUZZLES do
         for _, difficulty in ipairs(DIFFICULTIES) do
-            local puzzleState = saveData["puzzles"][difficulty][i]["state"]
-            local callbacks = self:generatePuzzleMenuItemCallbacks(difficulty, puzzleState, i)
+            local callbacks = self:generatePuzzleMenuItemCallbacks(difficulty, i)
             local puzzleMenuItem = PuzzleMenuItem(i, puzzleState, callbacks)
             table.insert(self.puzzleMenuItems[difficulty], puzzleMenuItem)
         end

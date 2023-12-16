@@ -3,6 +3,7 @@ local gfx <const> = pd.graphics
 
 class("HelperText").extends(gfx.sprite)
 
+--- Creates a new helper text
 function HelperText:init()
     local text = "Hold Ⓐ Reset Puzzle"
     local textWidth, textHeight = gfx.getTextSize(text)
