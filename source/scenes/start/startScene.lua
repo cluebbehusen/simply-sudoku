@@ -101,6 +101,9 @@ function StartScene:generatePuzzleMenuItemCallbacks(puzzleDifficulty, puzzleStat
     return callbacks
 end
 
+--- Resets a puzzle to its initial state
+--- @param puzzleDifficulty difficulty The puzzle difficulty
+--- @param puzzleNumber number The puzzle number
 function StartScene:handlePuzzleReset(puzzleDifficulty, puzzleNumber)
     local isLastPlayed = isLastPlayed(puzzleDifficulty, puzzleNumber)
     if isLastPlayed then

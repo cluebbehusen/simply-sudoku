@@ -32,5 +32,8 @@ function CompleteScene:leave()
 end
 
 function CompleteScene:AButtonUp()
+    if not self.transitionEnabled then
+        return
+    end
     self.sceneManager:enter("start")
 end
