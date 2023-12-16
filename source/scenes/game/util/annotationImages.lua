@@ -19,6 +19,7 @@ local function getUnselectedAnnotedDotImage()
     gfx.pushContext(image)
     gfx.fillRect(0, 0, 5, 5)
     gfx.setColor(gfx.kColorWhite)
+    gfx.popContext()
     return image
 end
 
@@ -28,6 +29,7 @@ local function getSelectedAnnotatedDotImage()
     local image = gfx.image.new(7, 7)
     gfx.pushContext(image)
     gfx.fillRect(0, 0, 7, 7)
+    gfx.popContext()
     return image
 end
 
@@ -54,7 +56,7 @@ local function getSelectedAnnotatedValueImage(value)
     gfx.setFont(gfx.font.new("fonts/smallNumbers"))
     gfx.pushContext(image)
     gfx.drawRect(0, 0, 7, 7)
-    gfx.drawText(tostring(value), 0, 0)
+    gfx.drawText(tostring(value), 1, 1)
     gfx.popContext()
     gfx.setFont(previousFont)
     return image

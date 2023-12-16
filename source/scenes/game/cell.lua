@@ -2,23 +2,7 @@ local pd <const> = playdate
 local gfx <const> = pd.graphics
 
 import "util/cellImages"
-
-local annotatedImage = gfx.image.new(5, 5)
-gfx.pushContext(annotatedImage)
-gfx.fillRect(0, 0, 5, 5)
-gfx.popContext()
-
-local selectedAnnotatedImage = gfx.image.new(7, 7)
-gfx.pushContext(selectedAnnotatedImage)
-gfx.fillRect(0, 0, 7, 7)
-gfx.popContext()
-
-local selectedImage = gfx.image.new(7, 7)
-gfx.pushContext(selectedImage)
-gfx.fillRect(0, 0, 7, 7)
-gfx.setColor(gfx.kColorWhite)
-gfx.fillRect(1, 1, 5, 5)
-gfx.popContext()
+import "util/annotationImages"
 
 local annotationPositions = {}
 local selectedAnnotationPositions = {}
@@ -33,6 +17,7 @@ class("Cell").extends(gfx.sprite)
 
 Cell.size = 23
 Cell.images = getCellImages(Cell.size)
+Cell.annotationImages = getAnnotationImages()
 
 --- Creates a new cell
 --- @param x number The x position
@@ -203,6 +188,8 @@ function Cell:updateImage()
         for annotation, _ in pairs(self.annotations) do
             if annotation ~= self.selectedAnnotation then
                 local x, y = table.unpack(annotationPositions[annotation])
+                local annotatedImage = Cell.annotationImages
+                    [getAnnotationImageKey(false, true, annotation)]
                 annotatedImage:draw(x, y)
             end
         end
@@ -215,9 +202,10 @@ function Cell:updateImage()
         image = image:copy()
         gfx.pushContext(image)
         local x, y = table.unpack(selectedAnnotationPositions[self.selectedAnnotation])
-        local selectedImage = selectedImage
+        local selectedImage = Cell.annotationImages
+            [getAnnotationImageKey(true, false)]
         if self.annotations and self.annotations[self.selectedAnnotation] then
-            selectedImage = selectedAnnotatedImage
+            selectedImage = Cell.annotationImages[getAnnotationImageKey(true, true, self.selectedAnnotation)]
         end
         selectedImage:draw(x, y)
         gfx.popContext()
