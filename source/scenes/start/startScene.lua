@@ -132,6 +132,7 @@ function StartScene:setupMenuItems()
 
     for i = 1, NUM_PUZZLES do
         for _, difficulty in ipairs(DIFFICULTIES) do
+            local puzzleState = saveData["puzzles"][difficulty][i]["state"]
             local callbacks = self:generatePuzzleMenuItemCallbacks(difficulty, i)
             local puzzleMenuItem = PuzzleMenuItem(i, puzzleState, callbacks)
             table.insert(self.puzzleMenuItems[difficulty], puzzleMenuItem)
