@@ -4,7 +4,10 @@ local pd <const> = playdate
 local function instantiateSaveData()
     local saveData = {
         lastPlayed = nil,
-        puzzles = {}
+        puzzles = {},
+        config = {
+            numberAnnotations = false,
+        }
     }
 
     for _, difficulty in ipairs(DIFFICULTIES) do
@@ -32,6 +35,23 @@ function maybeInstantiateSaveData()
     if not saveData then
         instantiateSaveData()
     end
+end
+
+function getAreNumberAnnotationsEnabled()
+    local saveData = pd.datastore.read()
+    if not saveData then
+        error("No save data found")
+    end
+
+    --- Handle case of old save data without config
+    if not saveData["config"] then
+        saveData["config"] = {
+            numberAnnotations = false,
+        }
+        pd.datastore.write(saveData)
+    end
+
+    return saveData["config"]["numberAnnotations"]
 end
 
 --- Checks if the supplied difficulty and number match the last played puzzle
