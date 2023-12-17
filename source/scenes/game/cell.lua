@@ -208,7 +208,7 @@ function Cell:updateImage()
             [getAnnotationImageKey(true, false)]
         if self.annotations and self.annotations[self.selectedAnnotation] then
             selectedImage = Cell.annotationImages
-            [getAnnotationImageKey(true, true, self.useNumberAnnotations and self.selectedAnnotation or nil)]
+                [getAnnotationImageKey(true, true, self.useNumberAnnotations and self.selectedAnnotation or nil)]
         end
         selectedImage:draw(x, y)
         gfx.popContext()

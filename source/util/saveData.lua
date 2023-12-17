@@ -54,6 +54,16 @@ function getAreNumberAnnotationsEnabled()
     return saveData["config"]["numberAnnotations"]
 end
 
+function setAreNumberAnnotationsEnabled(enabled)
+    local saveData = pd.datastore.read()
+    if not saveData then
+        error("No save data found")
+    end
+
+    saveData["config"]["numberAnnotations"] = enabled
+    pd.datastore.write(saveData)
+end
+
 --- Checks if the supplied difficulty and number match the last played puzzle
 --- @param difficulty string The difficulty
 --- @param number number The number

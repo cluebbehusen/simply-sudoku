@@ -152,6 +152,13 @@ function StartScene:setupMenuItems()
     })
     table.insert(self.mainMenuItems, tutorialMenuItem)
 
+    local optionMenuItem = StartMenuItem("Options", {
+        AButtonUp = function()
+            self.sceneManager:enter("options")
+        end,
+    })
+    table.insert(self.mainMenuItems, optionMenuItem)
+
     if saveData["lastPlayed"] then
         local callbacks = {
             AButtonUp = function()
