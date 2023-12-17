@@ -5,7 +5,7 @@ local gfx <const> = pd.graphics
 --- @param specified boolean Whether the cell has a specified (given) value
 --- @param value? number The value of the cell
 --- @return string key The key
-function getImageKey(specified, value)
+function getCellImageKey(specified, value)
     local specifiedString = specified and "specified" or "unspecified"
     if value then
         local valueString = tostring(value)
@@ -56,11 +56,11 @@ function getCellImages(cellSize)
     local getCellImage = getCellImageWrapper(cellSize)
 
     for i = 1, 9 do
-        images[getImageKey(true, i)] = getCellImage(true, i)
-        images[getImageKey(false, i)] = getCellImage(false, i)
+        images[getCellImageKey(true, i)] = getCellImage(true, i)
+        images[getCellImageKey(false, i)] = getCellImage(false, i)
     end
-    images[getImageKey(true)] = getCellImage(true)
-    images[getImageKey(false)] = getCellImage(false)
+    images[getCellImageKey(true)] = getCellImage(true)
+    images[getCellImageKey(false)] = getCellImage(false)
 
     gfx.setFont(previousFont)
 

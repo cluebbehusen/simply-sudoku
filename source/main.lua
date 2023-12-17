@@ -19,6 +19,7 @@ import "scenes/game/gameScene"
 import "scenes/start/startScene"
 import "scenes/complete/completeScene"
 import "scenes/tutorial/tutorialScene"
+import "scenes/options/optionsScene"
 
 maybeInstantiateSaveData()
 
@@ -27,6 +28,7 @@ local scenes = {
     start = StartScene(),
     complete = CompleteScene(),
     tutorial = TutorialScene(),
+    options = OptionsScene(),
 }
 
 local sceneManager = SceneManager(scenes, "start")

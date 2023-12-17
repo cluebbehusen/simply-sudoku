@@ -31,15 +31,13 @@ function Board:init(x, y, puzzleDifficulty, puzzleNumber, sceneManager)
     end
 
     local puzzleSaveData = saveData["puzzles"][self.puzzleDifficulty][self.puzzleNumber]
+    local useNumberAnnotations = getAreNumberAnnotationsEnabled()
 
     local progress = puzzleSaveData["progress"]
     local puzzleAnnotations = puzzleSaveData["annotations"]
     local state = puzzleSaveData["state"]
 
-    self.blockCellChange = false
-    if state == "completed" then
-        self.blockCellChange = true
-    end
+    self.blockCellChange = state == "completed"
 
     self.selRow = 1
     self.selColumn = 1
@@ -58,9 +56,9 @@ function Board:init(x, y, puzzleDifficulty, puzzleNumber, sceneManager)
             local offsetX = x + 2 + (column - 1) * (Cell.size + 1)
             local offsetY = y + 2 + (row - 1) * (Cell.size + 1)
             if specifiedValue ~= 0 then
-                self.cells[row][column] = Cell(offsetX, offsetY, specifiedValue, true)
+                self.cells[row][column] = Cell(offsetX, offsetY, specifiedValue, true, nil, useNumberAnnotations)
             else
-                self.cells[row][column] = Cell(offsetX, offsetY, progressValue, false, annotations)
+                self.cells[row][column] = Cell(offsetX, offsetY, progressValue, false, annotations, useNumberAnnotations)
             end
         end
     end

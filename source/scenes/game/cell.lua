@@ -2,23 +2,7 @@ local pd <const> = playdate
 local gfx <const> = pd.graphics
 
 import "util/cellImages"
-
-local annotatedImage = gfx.image.new(5, 5)
-gfx.pushContext(annotatedImage)
-gfx.fillRect(0, 0, 5, 5)
-gfx.popContext()
-
-local selectedAnnotatedImage = gfx.image.new(7, 7)
-gfx.pushContext(selectedAnnotatedImage)
-gfx.fillRect(0, 0, 7, 7)
-gfx.popContext()
-
-local selectedImage = gfx.image.new(7, 7)
-gfx.pushContext(selectedImage)
-gfx.fillRect(0, 0, 7, 7)
-gfx.setColor(gfx.kColorWhite)
-gfx.fillRect(1, 1, 5, 5)
-gfx.popContext()
+import "util/annotationImages"
 
 local annotationPositions = {}
 local selectedAnnotationPositions = {}
@@ -33,6 +17,7 @@ class("Cell").extends(gfx.sprite)
 
 Cell.size = 23
 Cell.images = getCellImages(Cell.size)
+Cell.annotationImages = getAnnotationImages()
 
 --- Creates a new cell
 --- @param x number The x position
@@ -40,12 +25,14 @@ Cell.images = getCellImages(Cell.size)
 --- @param value number The value of the cell (1-9)
 --- @param specified boolean Whether the cell is specified (given)
 --- @param annotations table<number, boolean> The annotations of the cell
-function Cell:init(x, y, value, specified, annotations)
+--- @param useNumberAnnotations boolean Whether to use number annotations
+function Cell:init(x, y, value, specified, annotations, useNumberAnnotations)
     self.value = value
     self.specified = specified
     self.selected = false
     self.selectedAnnotation = nil
     self.annotations = annotations
+    self.useNumberAnnotations = useNumberAnnotations
 
     self:updateImage()
     self:setCenter(0, 0)
@@ -194,7 +181,7 @@ end
 
 --- Updates the cell image
 function Cell:updateImage()
-    local imageKey = getImageKey(self.specified, self.value)
+    local imageKey = getCellImageKey(self.specified, self.value)
     local image = Cell.images[imageKey]
 
     if self.annotations then
@@ -203,6 +190,8 @@ function Cell:updateImage()
         for annotation, _ in pairs(self.annotations) do
             if annotation ~= self.selectedAnnotation then
                 local x, y = table.unpack(annotationPositions[annotation])
+                local annotatedImage = Cell.annotationImages
+                    [getAnnotationImageKey(false, true, self.useNumberAnnotations and annotation or nil)]
                 annotatedImage:draw(x, y)
             end
         end
@@ -215,9 +204,11 @@ function Cell:updateImage()
         image = image:copy()
         gfx.pushContext(image)
         local x, y = table.unpack(selectedAnnotationPositions[self.selectedAnnotation])
-        local selectedImage = selectedImage
+        local selectedImage = Cell.annotationImages
+            [getAnnotationImageKey(true, false)]
         if self.annotations and self.annotations[self.selectedAnnotation] then
-            selectedImage = selectedAnnotatedImage
+            selectedImage = Cell.annotationImages
+                [getAnnotationImageKey(true, true, self.useNumberAnnotations and self.selectedAnnotation or nil)]
         end
         selectedImage:draw(x, y)
         gfx.popContext()
