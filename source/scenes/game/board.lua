@@ -31,15 +31,13 @@ function Board:init(x, y, puzzleDifficulty, puzzleNumber, sceneManager)
     end
 
     local puzzleSaveData = saveData["puzzles"][self.puzzleDifficulty][self.puzzleNumber]
+    local useNumberAnnotations = getAreNumberAnnotationsEnabled()
 
     local progress = puzzleSaveData["progress"]
     local puzzleAnnotations = puzzleSaveData["annotations"]
     local state = puzzleSaveData["state"]
 
-    self.blockCellChange = false
-    if state == "completed" then
-        self.blockCellChange = true
-    end
+    self.blockCellChange = state == "completed"
 
     self.selRow = 1
     self.selColumn = 1
